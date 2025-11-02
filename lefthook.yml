@@ -1,0 +1,23 @@
+pre-push:
+  jobs:
+    - name: test typecheck
+      tags:
+        - frontend
+        - typecheck
+      run: pnpm typecheck
+    - name: test build
+      tags:
+        - frontend
+        - build
+      run: pnpm build
+    - name: packages audit
+      tags:
+        - frontend
+        - security
+      run: pnpm audit
+
+pre-commit:
+  parallel: true
+  jobs:
+    - run: pnpm lint {staged_files}
+      glob: "*.{js,ts,jsx,tsx,json}"
