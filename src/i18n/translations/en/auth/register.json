@@ -1,0 +1,17 @@
+{
+	"register": {
+		"confirm_password_is_required": "Confirm password is required",
+		"name_is_required": "Name is required",
+		"name_must_be_at_least_3_characters_long": "Name must be at least 3 characters long",
+		"phone_is_required": "Phone is required",
+		"phone_must_be_at_least_10_characters_long": "Phone must be at least 10 characters long",
+		"role_is_required": "Role is required",
+		"gender_is_required": "Gender is required",
+		"passwords_do_not_match": "Passwords do not match",
+		"please_enter_your_email": "Please enter your email",
+		"please_enter_your_password": "Please enter your password",
+		"please_enter_your_name": "Please enter your full name",
+		"please_enter_your_phone": "Please enter your phone number",
+		"please_enter_your_confirm_password": "Please confirm your password"
+	}
+}

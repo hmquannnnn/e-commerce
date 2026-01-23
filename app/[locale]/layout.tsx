@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.scss";
 import { ReactNode } from "react";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -30,8 +30,9 @@ interface ILocaleLayoutProps {
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: ILocaleLayoutProps) {
+  const { locale } = await params;
   setRequestLocale(locale);
 
   const messages = await getMessages();
