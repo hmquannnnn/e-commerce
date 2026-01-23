@@ -11,9 +11,10 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './auth.slice';
+import { SLICE_NAMES } from './slice-names';
 
 const rootReducer = combineReducers({
-	auth: authReducer,
+	[SLICE_NAMES.auth]: authReducer,
 });
 
 import type { PersistConfig } from 'redux-persist';
@@ -22,7 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
 	key: 'root',
 	storage,
-	whitelist: ['auth'],
+	whitelist: [SLICE_NAMES.auth],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

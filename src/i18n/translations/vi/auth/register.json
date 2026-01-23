@@ -1,0 +1,18 @@
+{
+	"register": {
+		"confirm_password_is_required": "Xác nhận mật khẩu không được để trống",
+		"name_is_required": "Họ và tên không được để trống",
+		"name_must_be_at_least_3_characters_long": "Họ và tên phải có ít nhất 3 ký tự",
+		"phone_is_required": "Số điện thoại không được để trống",
+		"phone_must_be_at_least_10_characters_long": "Số điện thoại phải có ít nhất 10 ký tự",
+		"role_is_required": "Vai trò không được để trống",
+		"gender_is_required": "Giới tính không được để trống",
+		"passwords_do_not_match": "Mật khẩu không khớp",
+		"please_enter_your_email": "Vui lòng nhập email của bạn",
+		"please_enter_your_password": "Vui lòng nhập mật khẩu của bạn",
+		"please_enter_your_name": "Vui lòng nhập họ và tên của bạn",
+		"please_enter_your_phone": "Vui lòng nhập số điện thoại của bạn",
+		"please_enter_your_confirm_password": "Vui lòng xác nhận mật khẩu của bạn"
+	}
+}
+
