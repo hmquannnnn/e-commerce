@@ -3,8 +3,7 @@ export interface ILoginRequest {
 	password: string;
 }
 
-export interface ILoginResponse {
-}
+export interface ILoginResponse {}
 
 export interface IRegisterRequest {
 	email: string;
@@ -18,19 +17,14 @@ export interface IRegisterRequest {
 
 export interface IRegisterForm extends IRegisterRequest {
 	confirmPassword: string;
-};
-
-export interface IRegisterResponse {
 }
 
-export interface IRefreshTokenRequest {
-}
+export interface IRegisterResponse {}
 
-export interface IRefreshTokenResponse {
-}
+export interface IRefreshTokenRequest {}
 
-export interface ILogoutRequest {
-}
+export interface IRefreshTokenResponse {}
 
-export interface ILogoutResponse {
-}
+export interface ILogoutRequest {}
+
+export interface ILogoutResponse {}

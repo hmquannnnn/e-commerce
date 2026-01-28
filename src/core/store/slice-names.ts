@@ -3,4 +3,3 @@ export const SLICE_NAMES = {
 } as const;
 
 export type SliceName = (typeof SLICE_NAMES)[keyof typeof SLICE_NAMES];
-

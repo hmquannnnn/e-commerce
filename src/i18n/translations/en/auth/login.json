@@ -2,9 +2,9 @@
 	"login": {
 		"email_is_required": "Email is required",
 		"invalid_email_format": "Invalid email format",
+		"invalid_password_format": "Password must contain uppercase, lowercase, number, and special character",
 		"password_is_required": "Password is required",
 		"password_must_be_at_least_8_characters_long": "Password must be at least 8 characters long",
-		"invalid_password_format": "Password must contain uppercase, lowercase, number, and special character",
 		"please_enter_your_email": "Please enter your email",
 		"please_enter_your_password": "Please enter your password"
 	}

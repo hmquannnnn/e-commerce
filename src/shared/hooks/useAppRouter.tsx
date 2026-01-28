@@ -1,14 +1,17 @@
-import { useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 const useAppRouter = () => {
 	const locale = useLocale();
 	const router = useRouter();
 
-	const push = useCallback((path: string) => {
-		router.push(`/${locale}${path}`);
-	}, [locale, router]);
+	const push = useCallback(
+		(path: string) => {
+			router.push(`/${locale}${path}`);
+		},
+		[locale, router]
+	);
 
 	return {
 		push,

@@ -2,6 +2,7 @@
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5",
+    "useTabs": true,
     "tabWidth": 2,
     "printWidth": 120,
     "jsxSingleQuote": false,
@@ -11,7 +12,7 @@
         "prettier-plugin-sort-json",
         "prettier-plugin-tailwindcss"
     ],
-    "jsonRecursiveSort": false,
+    "jsonRecursiveSort": true,
     "jsonSortOrder": "{\"*\": \"lexical\"}",
     "tailwindStylesheet": "./app/globals.scss",
     "tailwindFunctions": [

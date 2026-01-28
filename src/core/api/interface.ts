@@ -12,13 +12,13 @@ export interface IApiErrorResponse {
 }
 
 export interface CustomHookMutationParams<
-  TData = unknown,
-  TError = DefaultError,
-  TVariables = void,
-  TContext = unknown,
+	TData = unknown,
+	TError = DefaultError,
+	TVariables = void,
+	TContext = unknown,
 > {
-  meta?: Record<string, unknown>;
-  onSuccess?: (data: TData) => void;
-  onError?: (error: TError) => void;
-  onSettled?: (data: TData | undefined, error: TError | null, variables: TVariables, context: TContext) => void;
+	meta?: Record<string, unknown>;
+	onSuccess?: (data: TData) => void;
+	onError?: (error: TError) => void;
+	onSettled?: (data: TData | undefined, error: TError | null, variables: TVariables, context: TContext) => void;
 }

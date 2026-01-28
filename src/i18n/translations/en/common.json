@@ -1,23 +1,23 @@
 {
-  "common": {
-    "email": "Email",
-    "password": "Password",
-    "login": "Login",
-    "register": "Register",
-    "logout": "Logout",
-    "name": "Full Name",
-    "phone": "Phone Number",
-    "gender": "Gender",
-    "confirm_password": "Confirm Password",
-    "welcome_back": "Welcome Back",
-    "create_account": "Create Account",
-    "dont_have_account": "Don't have an account?",
-    "already_have_account": "Already have an account?",
-    "sign_in_to_continue": "Sign in to continue to your account",
-    "sign_up_to_get_started": "Sign up to get started with your account",
-    "male": "Male",
-    "female": "Female",
-    "others": "Others",
-    "select_gender": "Select gender"
-  }
+	"common": {
+		"already_have_account": "Already have an account?",
+		"confirm_password": "Confirm Password",
+		"create_account": "Create Account",
+		"dont_have_account": "Don't have an account?",
+		"email": "Email",
+		"female": "Female",
+		"gender": "Gender",
+		"login": "Login",
+		"logout": "Logout",
+		"male": "Male",
+		"name": "Full Name",
+		"others": "Others",
+		"password": "Password",
+		"phone": "Phone Number",
+		"register": "Register",
+		"select_gender": "Select gender",
+		"sign_in_to_continue": "Sign in to continue to your account",
+		"sign_up_to_get_started": "Sign up to get started with your account",
+		"welcome_back": "Welcome Back"
+	}
 }
