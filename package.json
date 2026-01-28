@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
-    "prepare": "lefthook install"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
