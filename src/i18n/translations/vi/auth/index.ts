@@ -1,5 +1,5 @@
-import login from "./login.json";
-import register from "./register.json";
+import login from './login.json';
+import register from './register.json';
 
 const authMessages = {
 	...login,

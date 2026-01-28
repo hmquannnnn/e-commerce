@@ -1,5 +1,5 @@
-import common from "./common.json";
-import authMessages from "./auth";
+import common from './common.json';
+import authMessages from './auth';
 
 const messages = { ...common, auth: authMessages };
 
