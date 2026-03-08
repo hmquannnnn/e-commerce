@@ -8,12 +8,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createRegisterSchema } from '../schema';
 import { Input } from '@/src/shared/components/base/ui/input';
 import { Button } from '@/src/shared/components/base/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
-import { EGender } from '../enums';
 
 const RegisterForm = () => {
 	const t = useTranslations();
@@ -35,15 +33,15 @@ const RegisterForm = () => {
 			password: '',
 			confirmPassword: '',
 			name: '',
-			phone: '',
-			gender: '',
-			avatar: '',
-			birthday: '',
 		},
 	});
 
 	const onSubmit = (data: IRegisterForm) => {
-		const { confirmPassword, ...registerPayload } = data;
+		const registerPayload = {
+			email: data.email,
+			password: data.password,
+			name: data.name,
+		};
 		register(registerPayload, {
 			onSuccess: () => router.push(ROUTES.HOME),
 		});
@@ -105,50 +103,6 @@ const RegisterForm = () => {
 								)}
 							/>
 							{errors.email && <p className="mt-1.5 text-sm">{errors.email.message}</p>}
-						</div>
-
-						<div>
-							<label htmlFor="phone" className="mb-2 block text-sm font-medium">
-								{t('common.phone')}
-							</label>
-							<Controller
-								name="phone"
-								control={control}
-								render={({ field }) => (
-									<Input
-										{...field}
-										id="phone"
-										type="tel"
-										placeholder={t('auth.register.please_enter_your_phone')}
-										aria-invalid={!!errors.phone}
-										className="w-full"
-									/>
-								)}
-							/>
-							{errors.phone && <p className="mt-1.5 text-sm">{errors.phone.message}</p>}
-						</div>
-
-						<div>
-							<label htmlFor="gender" className="mb-2 block text-sm font-medium">
-								{t('common.gender')}
-							</label>
-							<Controller
-								name="gender"
-								control={control}
-								render={({ field }) => (
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger className="w-full" aria-invalid={!!errors.gender}>
-											<SelectValue placeholder={t('common.select_gender')} />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value={EGender.MALE}>{t('common.male')}</SelectItem>
-											<SelectItem value={EGender.FEMALE}>{t('common.female')}</SelectItem>
-											<SelectItem value={EGender.OTHERS}>{t('common.others')}</SelectItem>
-										</SelectContent>
-									</Select>
-								)}
-							/>
-							{errors.gender && <p className="mt-1.5 text-sm">{errors.gender.message}</p>}
 						</div>
 
 						<div>
