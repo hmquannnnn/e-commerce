@@ -27,13 +27,6 @@ export const createRegisterSchema = (t: TranslationFunction) => {
 				.string()
 				.nonempty(t('auth.register.name_is_required'))
 				.min(3, t('auth.register.name_must_be_at_least_3_characters_long')),
-			phone: z
-				.string()
-				.nonempty(t('auth.register.phone_is_required'))
-				.min(10, t('auth.register.phone_must_be_at_least_10_characters_long')),
-			avatar: z.string().optional(),
-			birthday: z.string().optional(),
-			gender: z.string().nonempty(t('auth.register.gender_is_required')),
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: t('auth.register.passwords_do_not_match'),
