@@ -1,5 +1,10 @@
 import axios, { type AxiosInstance } from 'axios';
+import { toast } from 'sonner';
 import { store } from '@/src/core/store/store';
+import { clearAuth, setAccessToken } from '@/src/core/store/auth.slice';
+import { EHttpStatusCode } from '@/src/shared/constants/http-status-code.enum';
+import type { IApiResponse } from './interface';
+import type { IRefreshTokenResponse } from '@/src/features/auth/interfaces';
 
 const defaultApiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
 if (defaultApiEndpoint === undefined || defaultApiEndpoint.trim() === '') {
@@ -15,6 +20,14 @@ interface IInitializeApiClientCustomConfigs {
 }
 
 const apiSingletonInstancesMap = new Map<string, AxiosInstance>();
+
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+
+const flushQueue = (token: string | null, error: unknown = null) => {
+	failedQueue.forEach(({ resolve, reject }) => (token ? resolve(token) : reject(error)));
+	failedQueue = [];
+};
 
 /**
  *
@@ -68,6 +81,56 @@ const initializeApiClientInstance = (
 			}
 			return config;
 		});
+
+		apiClient.interceptors.response.use(
+			(response) => response,
+			async (error: unknown) => {
+				if (!axios.isAxiosError(error)) return Promise.reject(error);
+
+				const originalRequest = error.config;
+				const status = error.response?.status;
+
+				if (status !== EHttpStatusCode.unauthenticated || !originalRequest) {
+					return Promise.reject(error);
+				}
+
+				if (isRefreshing) {
+					return new Promise<string>((resolve, reject) => {
+						failedQueue.push({ resolve, reject });
+					}).then((newToken) => {
+						(originalRequest.headers as Record<string, string>).Authorization = `Bearer ${newToken}`;
+						return apiClient(originalRequest);
+					});
+				}
+
+				isRefreshing = true;
+
+				try {
+					const refreshResponse = await axios.post<IApiResponse<IRefreshTokenResponse>>(
+						`${baseURL}/auth/refresh-token`,
+						{},
+						{ withCredentials: true }
+					);
+
+					const newAccessToken = refreshResponse.data.data.accessToken;
+					store.dispatch(setAccessToken(newAccessToken));
+					flushQueue(newAccessToken);
+
+					(originalRequest.headers as Record<string, string>).Authorization = `Bearer ${newAccessToken}`;
+					return apiClient(originalRequest);
+				} catch (refreshError) {
+					store.dispatch(clearAuth());
+					flushQueue(null, refreshError);
+					toast.error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại');
+					if (typeof window !== 'undefined') {
+						window.location.href = '/';
+					}
+					return Promise.reject(refreshError);
+				} finally {
+					isRefreshing = false;
+				}
+			}
+		);
 	}
 
 	apiSingletonInstancesMap.set(combinedInstanceKey, apiClient);
