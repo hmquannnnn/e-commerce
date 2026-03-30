@@ -1,0 +1,9 @@
+{
+	"detail": {
+		"back_to_products": "Back to products",
+		"description": "Product Description",
+		"load_error": "Failed to load product details",
+		"not_found": "Product not found",
+		"specifications": "Specifications"
+	}
+}

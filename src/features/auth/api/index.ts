@@ -15,7 +15,9 @@ const queryClient = initializeApiClientInstance({});
 const login = async (request: ILoginRequest) =>
 	queryClient.post<IApiResponse<ILoginResponse>>('/auth/login', request).then((response) => response.data);
 
-export const useLogin = (params: CustomHookMutationParams<ILoginResponse, DefaultError, ILoginRequest>) => {
+export const useLogin = (
+	params: CustomHookMutationParams<IApiResponse<ILoginResponse>, DefaultError, ILoginRequest>
+) => {
 	return useMutation({
 		mutationFn: login,
 		...(params ?? {}),
@@ -25,7 +27,9 @@ export const useLogin = (params: CustomHookMutationParams<ILoginResponse, Defaul
 const register = async (request: IRegisterRequest) =>
 	queryClient.post<IApiResponse<IRegisterResponse>>('/auth/register', request).then((response) => response.data);
 
-export const useRegister = (params: CustomHookMutationParams<IRegisterResponse, DefaultError, IRegisterRequest>) => {
+export const useRegister = (
+	params: CustomHookMutationParams<IApiResponse<IRegisterResponse>, DefaultError, IRegisterRequest>
+) => {
 	return useMutation({
 		mutationFn: register,
 		...(params ?? {}),
