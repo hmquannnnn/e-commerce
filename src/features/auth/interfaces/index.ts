@@ -3,7 +3,18 @@ export interface ILoginRequest {
 	password: string;
 }
 
-export interface ILoginResponse {}
+export interface IUserInfo {
+	id: string;
+	email: string;
+	name: string;
+	role: string;
+}
+
+export interface ILoginResponse {
+	access_token: string;
+	refresh_token: string;
+	user: IUserInfo;
+}
 
 export interface IRegisterRequest {
 	email: string;
@@ -15,11 +26,19 @@ export interface IRegisterForm extends IRegisterRequest {
 	confirmPassword: string;
 }
 
-export interface IRegisterResponse {}
+export interface IRegisterResponse {
+	access_token: string;
+	refresh_token: string;
+	user: IUserInfo;
+}
 
-export interface IRefreshTokenRequest {}
+export interface IRefreshTokenRequest {
+	refresh_token: string;
+}
 
-export interface IRefreshTokenResponse {}
+export interface IRefreshTokenResponse {
+	access_token: string;
+}
 
 export interface ILogoutRequest {}
 

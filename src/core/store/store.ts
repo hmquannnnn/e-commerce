@@ -9,7 +9,7 @@ const rootReducer = combineReducers({
 });
 
 import type { PersistConfig } from 'redux-persist';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
 	key: 'root',
@@ -35,4 +35,4 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
-export const useAppSelector = useSelector.withTypes<RootState>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

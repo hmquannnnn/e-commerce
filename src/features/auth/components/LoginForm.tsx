@@ -12,12 +12,16 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
+import { ShoppingBag } from 'lucide-react';
+import { useAppDispatch } from '@/src/core/store/store';
+import { setAccessToken, setRefreshToken, setUser } from '@/src/core/store/auth.slice';
 
 const LoginForm = () => {
 	const { mutate: login, isPending, error } = useLogin({});
 	const t = useTranslations();
 	const locale = useLocale();
 	const router = useAppRouter();
+	const dispatch = useAppDispatch();
 
 	const loginSchema = useMemo(() => createLoginSchema(t), [t]);
 
@@ -35,16 +39,27 @@ const LoginForm = () => {
 
 	const onSubmit = (data: ILoginRequest) => {
 		login(data, {
-			onSuccess: () => router.push(ROUTES.HOME),
+			onSuccess: (res) => {
+				dispatch(setAccessToken(res.data.access_token));
+				dispatch(setRefreshToken(res.data.refresh_token));
+				dispatch(setUser(res.data.user));
+				router.push(ROUTES.HOME);
+			},
 		});
 	};
 
 	return (
 		<div className="flex min-h-screen items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
-				<div className="mb-8 text-center">
+				<div className="mb-8 flex flex-col items-center text-center">
+					<Link href={`/${locale}`} className="mb-6 flex items-center gap-2">
+						<div className="bg-primary flex h-9 w-9 items-center justify-center rounded-lg">
+							<ShoppingBag className="text-primary-foreground h-5 w-5" />
+						</div>
+						<span className="text-2xl font-bold tracking-tight">ShopNow</span>
+					</Link>
 					<h1 className="mb-2 text-3xl font-bold">{t('common.welcome_back')}</h1>
-					<p>{t('common.sign_in_to_continue')}</p>
+					<p className="text-muted-foreground">{t('common.sign_in_to_continue')}</p>
 				</div>
 
 				<div className="rounded-lg p-8 shadow-md">

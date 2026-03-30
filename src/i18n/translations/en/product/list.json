@@ -1,0 +1,11 @@
+{
+	"list": {
+		"add_to_cart": "Add to Cart",
+		"all_categories": "All",
+		"clear_filters": "Clear filters",
+		"load_error": "Failed to load products",
+		"no_products": "No products found",
+		"search_placeholder": "Search products...",
+		"showing_count": "Showing {count} / {total} products"
+	}
+}
