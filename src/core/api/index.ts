@@ -107,10 +107,9 @@ const initializeApiClientInstance = (
 
 				try {
 					const storedRefreshToken = store.getState().auth.refreshToken;
-					const refreshResponse = await axios.post<IApiResponse<IRefreshTokenResponse>>(
-						`${baseURL}/auth/refresh-token`,
-						{ refresh_token: storedRefreshToken }
-					);
+					const refreshResponse = await axios.post<IApiResponse<IRefreshTokenResponse>>(`${baseURL}/auth/refresh`, {
+						refresh_token: storedRefreshToken,
+					});
 
 					const newAccessToken = refreshResponse.data.data.access_token;
 					store.dispatch(setAccessToken(newAccessToken));
