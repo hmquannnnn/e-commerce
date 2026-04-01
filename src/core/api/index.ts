@@ -22,7 +22,7 @@ interface IInitializeApiClientCustomConfigs {
 const apiSingletonInstancesMap = new Map<string, AxiosInstance>();
 
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (error: unknown) => void }> = [];
 
 const flushQueue = (token: string | null, error: unknown = null) => {
 	failedQueue.forEach(({ resolve, reject }) => (token ? resolve(token) : reject(error)));
@@ -106,13 +106,13 @@ const initializeApiClientInstance = (
 				isRefreshing = true;
 
 				try {
+					const storedRefreshToken = store.getState().auth.refreshToken;
 					const refreshResponse = await axios.post<IApiResponse<IRefreshTokenResponse>>(
 						`${baseURL}/auth/refresh-token`,
-						{},
-						{ withCredentials: true }
+						{ refresh_token: storedRefreshToken }
 					);
 
-					const newAccessToken = refreshResponse.data.data.accessToken;
+					const newAccessToken = refreshResponse.data.data.access_token;
 					store.dispatch(setAccessToken(newAccessToken));
 					flushQueue(newAccessToken);
 
