@@ -3,19 +3,19 @@
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { ArrowLeft, Package, ShoppingCart, AlertCircle, RefreshCw, Tag } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { Separator } from '@/src/shared/components/base/ui/separator';
+import { formatPrice } from '@/src/shared/lib/utils';
 import { useProduct, useCategories } from '../api';
 import { ROUTES } from '@/src/shared/constants/routes';
+import { useAddCartItem } from '@/src/features/cart/api';
 
 interface ProductDetailProps {
 	id: string;
 }
-
-const formatPrice = (price: number) =>
-	new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
 const ProductDetailSkeleton = () => (
 	<div className="grid grid-cols-1 gap-10 md:grid-cols-2">
@@ -40,6 +40,18 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 	const locale = useLocale();
 	const { data: product, isLoading, isError, refetch } = useProduct(id);
 	const { data: categories } = useCategories();
+	const addCartItem = useAddCartItem();
+
+	const handleAddToCart = () => {
+		if (!product) return;
+		addCartItem.mutate(
+			{ product_id: product.id, quantity: 1 },
+			{
+				onSuccess: () => toast.success(t('cart.add_success')),
+				onError: () => toast.error(t('cart.add_error')),
+			}
+		);
+	};
 
 	const categoryName = product?.category_id ? categories?.find((c) => c.id === product.category_id)?.name : undefined;
 
@@ -120,9 +132,9 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 
 					{/* Actions */}
 					<div className="mt-auto pt-2">
-						<Button size="lg" className="w-full gap-2">
+						<Button size="lg" className="w-full gap-2" onClick={handleAddToCart} disabled={addCartItem.isPending}>
 							<ShoppingCart className="h-5 w-5" />
-							{t('product.list.add_to_cart')}
+							{addCartItem.isPending ? t('cart.adding') : t('product.list.add_to_cart')}
 						</Button>
 					</div>
 				</div>
