@@ -1,0 +1,20 @@
+{
+	"cart": {
+		"add_error": "Không thể thêm vào giỏ hàng",
+		"add_success": "Đã thêm vào giỏ hàng",
+		"adding": "Đang thêm...",
+		"checkout": "Đặt hàng",
+		"continue_shopping": "Tiếp tục mua sắm",
+		"decrease_qty": "Giảm số lượng",
+		"empty_description": "Hãy thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm.",
+		"empty_title": "Giỏ hàng trống",
+		"increase_qty": "Tăng số lượng",
+		"item_count": "{count} sản phẩm",
+		"load_error": "Không thể tải giỏ hàng",
+		"login_required": "Vui lòng đăng nhập để xem giỏ hàng",
+		"remove": "Xóa sản phẩm",
+		"summary": "Tóm tắt đơn hàng",
+		"title": "Giỏ hàng",
+		"total": "Tổng cộng"
+	}
+}

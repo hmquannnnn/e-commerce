@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { ShoppingBag, User, LogOut } from 'lucide-react';
+import { ShoppingBag, ShoppingCart, User, LogOut } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
 import {
 	DropdownMenu,
@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '@/src/core/store/store';
 import { clearAuth } from '@/src/core/store/auth.slice';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
+import { useCart } from '@/src/features/cart/api';
 
 const Header = () => {
 	const t = useTranslations();
@@ -25,6 +26,8 @@ const Header = () => {
 	const accessToken = useAppSelector((state) => state.auth.accessToken);
 	const user = useAppSelector((state) => state.auth.user);
 	const isAuthenticated = !!accessToken;
+	const { data: cart } = useCart();
+	const cartCount = cart?.total_quantity ?? 0;
 
 	const handleLogout = () => {
 		dispatch(clearAuth());
@@ -60,6 +63,17 @@ const Header = () => {
 
 				{/* Auth actions */}
 				<div className="flex items-center gap-2">
+					{/* Cart icon */}
+					<Button variant="ghost" size="icon" className="relative" asChild>
+						<Link href={`/${locale}${ROUTES.CART}`} aria-label={t('cart.title')}>
+							<ShoppingCart className="h-5 w-5" />
+							{isAuthenticated && cartCount > 0 && (
+								<span className="bg-primary text-primary-foreground absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold tabular-nums">
+									{cartCount > 99 ? '99+' : cartCount}
+								</span>
+							)}
+						</Link>
+					</Button>
 					{isAuthenticated ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>

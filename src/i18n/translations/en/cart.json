@@ -1,0 +1,20 @@
+{
+	"cart": {
+		"add_error": "Failed to add to cart",
+		"add_success": "Added to cart",
+		"adding": "Adding...",
+		"checkout": "Place Order",
+		"continue_shopping": "Continue Shopping",
+		"decrease_qty": "Decrease quantity",
+		"empty_description": "Add some products to your cart to start shopping.",
+		"empty_title": "Your cart is empty",
+		"increase_qty": "Increase quantity",
+		"item_count": "{count} items",
+		"load_error": "Failed to load cart",
+		"login_required": "Please log in to view your cart",
+		"remove": "Remove item",
+		"summary": "Order Summary",
+		"title": "Cart",
+		"total": "Total"
+	}
+}

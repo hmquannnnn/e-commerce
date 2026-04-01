@@ -1,5 +1,6 @@
 export const ROUTES = {
 	HOME: '/',
+	CART: '/cart',
 	AUTH: {
 		LOGIN: '/auth/login',
 		REGISTER: '/auth/register',
