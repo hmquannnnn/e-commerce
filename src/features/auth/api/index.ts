@@ -37,9 +37,7 @@ export const useRegister = (
 };
 
 const refreshToken = async (request: IRefreshTokenRequest) =>
-	queryClient
-		.post<IApiResponse<IRefreshTokenResponse>>('/auth/refresh-token', request)
-		.then((response) => response.data);
+	queryClient.post<IApiResponse<IRefreshTokenResponse>>('/auth/refresh', request).then((response) => response.data);
 
 export const useRefreshToken = () => {
 	return useMutation({
