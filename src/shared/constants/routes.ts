@@ -1,6 +1,11 @@
 export const ROUTES = {
 	HOME: '/',
 	CART: '/cart',
+	CHECKOUT: '/checkout',
+	ORDERS: {
+		LIST: '/orders',
+		DETAIL: (id: string) => `/orders/${id}`,
+	},
 	AUTH: {
 		LOGIN: '/auth/login',
 		REGISTER: '/auth/register',

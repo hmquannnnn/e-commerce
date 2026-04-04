@@ -21,6 +21,12 @@ export const metadata: Metadata = {
 	description: 'UAV Shop',
 };
 
+/**
+ * Shell storefront (Header + main) nằm ở route groups — không gắn vào đây để tránh bọc cả /auth và /admin:
+ * - `(marketing)/layout.tsx` — trang chủ (Header + hero/sections tùy biến)
+ * - `(shop)/layout.tsx` — cart, checkout, orders, product detail (Header + container main)
+ */
+
 interface ILocaleLayoutProps {
 	children: ReactNode;
 	params: Promise<{
