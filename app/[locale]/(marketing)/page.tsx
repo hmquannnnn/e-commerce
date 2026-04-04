@@ -1,6 +1,5 @@
 import { getTranslations } from 'next-intl/server';
 import { Truck, Shield, RefreshCw, ShoppingBag } from 'lucide-react';
-import Header from '@/src/shared/components/layout/Header';
 import ProductList from '@/src/features/product/components/ProductList';
 
 export default async function HomePage() {
@@ -14,10 +13,7 @@ export default async function HomePage() {
 	];
 
 	return (
-		<div className="min-h-screen">
-			<Header />
-
-			{/* Hero section */}
+		<>
 			<section className="from-primary/10 via-background to-background bg-gradient-to-b px-4 py-16 text-center">
 				<div className="mx-auto max-w-2xl">
 					<h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
@@ -27,7 +23,6 @@ export default async function HomePage() {
 				</div>
 			</section>
 
-			{/* Feature highlights */}
 			<section className="bg-muted/40 border-y">
 				<div className="container mx-auto max-w-7xl px-4 py-6">
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -46,11 +41,10 @@ export default async function HomePage() {
 				</div>
 			</section>
 
-			{/* Products section */}
 			<main className="container mx-auto max-w-7xl px-4 py-10">
 				<h2 className="mb-6 text-2xl font-bold">{t('product.home.featured_products')}</h2>
 				<ProductList />
 			</main>
-		</div>
+		</>
 	);
 }

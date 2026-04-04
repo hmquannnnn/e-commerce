@@ -59,6 +59,14 @@ const Header = () => {
 					>
 						{t('common.products')}
 					</Link>
+					{isAuthenticated && (
+						<Link
+							href={`/${locale}${ROUTES.ORDERS.LIST}`}
+							className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+						>
+							{t('order.nav_orders')}
+						</Link>
+					)}
 				</nav>
 
 				{/* Auth actions */}
