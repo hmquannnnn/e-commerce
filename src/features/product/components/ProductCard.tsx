@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from '@/src/shared/components/base/ui/c
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { IProduct } from '../interfaces';
+import Image from 'next/image';
 import { ShoppingCart, Package } from 'lucide-react';
 import { formatPrice } from '@/src/shared/lib/utils';
 import { ROUTES } from '@/src/shared/constants/routes';
@@ -37,9 +38,21 @@ const ProductCard = ({ product, categoryName }: ProductCardProps) => {
 		<Card className="group flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
 			<Link href={`/${locale}${ROUTES.PRODUCTS.DETAIL(product.id)}`} className="block">
 				<div className="bg-muted relative aspect-square overflow-hidden">
-					<div className="from-muted to-muted/60 flex h-full w-full items-center justify-center bg-gradient-to-br">
-						<Package className="text-muted-foreground/40 h-16 w-16" />
-					</div>
+					{product.primary_image_url ? (
+						<Image
+							src={product.primary_image_url}
+							alt={product.name}
+							fill
+							className="object-cover transition-transform duration-300 group-hover:scale-105"
+							sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+							unoptimized
+							loading="eager"
+						/>
+					) : (
+						<div className="from-muted to-muted/60 flex h-full w-full items-center justify-center bg-gradient-to-br">
+							<Package className="text-muted-foreground/40 h-16 w-16" />
+						</div>
+					)}
 					{categoryName && (
 						<Badge variant="secondary" className="absolute left-2 top-2 text-xs">
 							{categoryName}
