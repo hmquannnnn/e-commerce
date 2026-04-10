@@ -14,6 +14,7 @@ export interface IProduct {
 	price: number;
 	specs?: Record<string, unknown>;
 	category_id?: number;
+	primary_image_url?: string;
 	created_at: string;
 	updated_at: string;
 }
