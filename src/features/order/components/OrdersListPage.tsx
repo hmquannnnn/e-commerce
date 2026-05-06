@@ -13,13 +13,16 @@ import { formatPrice } from '@/src/shared/lib/utils';
 import { useOrders } from '../api';
 import type { OrderStatus } from '../interfaces';
 
-const statusVariant = (status: OrderStatus): 'default' | 'secondary' | 'destructive' | 'outline' => {
+const statusVariant = (status: OrderStatus): 'default' | 'secondary' | 'destructive' | 'success' | 'warning' => {
 	switch (status) {
 		case 'CANCELLED':
 			return 'destructive';
 		case 'PAID':
-		case 'PROCESSING':
-			return 'default';
+		case 'DELIVERING':
+		case 'DELIVERED':
+			return 'success';
+		case 'PENDING':
+			return 'warning';
 		default:
 			return 'secondary';
 	}

@@ -1,17 +1,28 @@
 'use client';
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Package, ShoppingCart, AlertCircle, RefreshCw, Tag } from 'lucide-react';
+import { ArrowLeft, ImageOff, Package, ShoppingCart, AlertCircle, RefreshCw, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { Separator } from '@/src/shared/components/base/ui/separator';
-import { formatPrice } from '@/src/shared/lib/utils';
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselPrevious,
+	CarouselNext,
+	type CarouselApi,
+} from '@/src/shared/components/base/ui/carousel';
+import { cn, formatPrice } from '@/src/shared/lib/utils';
 import { useProduct, useCategories } from '../api';
 import { ROUTES } from '@/src/shared/constants/routes';
 import { useAddCartItem } from '@/src/features/cart/api';
+import type { IProductImage } from '../interfaces';
 
 interface ProductDetailProps {
 	id: string;
@@ -34,6 +45,102 @@ const ProductDetailSkeleton = () => (
 		</div>
 	</div>
 );
+
+const ProductImageGallery = ({ images, productName }: { images: IProductImage[]; productName: string }) => {
+	const [api, setApi] = useState<CarouselApi>();
+	const [current, setCurrent] = useState(0);
+
+	const sortedImages = useMemo(() => {
+		if (!images.length) return [];
+		const sorted = [...images].sort((a, b) => a.display_order - b.display_order);
+		const primaryIdx = sorted.findIndex((img) => img.is_primary);
+		if (primaryIdx > 0) {
+			const [primary] = sorted.splice(primaryIdx, 1);
+			sorted.unshift(primary);
+		}
+		return sorted;
+	}, [images]);
+
+	const onSelect = useCallback(() => {
+		if (!api) return;
+		setCurrent(api.selectedScrollSnap());
+	}, [api]);
+
+	useEffect(() => {
+		if (!api) return;
+		// Only sync from Embla's `select` events — avoid synchronous setState in the effect body (eslint).
+		api.on('select', onSelect);
+		return () => {
+			api.off('select', onSelect);
+		};
+	}, [api, onSelect]);
+
+	if (!sortedImages.length) {
+		return (
+			<div className="bg-muted flex aspect-square items-center justify-center rounded-2xl">
+				<ImageOff className="text-muted-foreground/30 h-32 w-32" />
+			</div>
+		);
+	}
+
+	if (sortedImages.length === 1) {
+		return (
+			<div className="bg-muted relative aspect-square overflow-hidden rounded-2xl">
+				<Image
+					src={sortedImages[0].url}
+					alt={productName}
+					fill
+					className="object-cover"
+					sizes="(max-width: 768px) 100vw, 50vw"
+					unoptimized
+				/>
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-3">
+			<Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
+				<CarouselContent>
+					{sortedImages.map((img) => (
+						<CarouselItem key={img.id}>
+							<div className="bg-muted relative aspect-square overflow-hidden rounded-2xl">
+								<Image
+									src={img.url}
+									alt={productName}
+									fill
+									className="object-cover"
+									sizes="(max-width: 768px) 100vw, 50vw"
+									unoptimized
+								/>
+							</div>
+						</CarouselItem>
+					))}
+				</CarouselContent>
+				<CarouselPrevious className="bg-background/80 left-3 backdrop-blur-sm" />
+				<CarouselNext className="bg-background/80 right-3 backdrop-blur-sm" />
+			</Carousel>
+
+			{/* Thumbnails */}
+			<div className="flex justify-center gap-2">
+				{sortedImages.map((img, idx) => (
+					<button
+						key={img.id}
+						onClick={() => api?.scrollTo(idx)}
+						className={cn(
+							'relative h-14 w-14 overflow-hidden rounded-lg border-2 transition-all',
+							current === idx
+								? 'border-primary ring-primary/25 ring-2'
+								: 'border-transparent opacity-60 hover:opacity-100'
+						)}
+					>
+						<Image src={img.url} alt="" fill className="object-cover" sizes="56px" unoptimized />
+					</button>
+				))}
+			</div>
+		</div>
+	);
+};
 
 const ProductDetail = ({ id }: ProductDetailProps) => {
 	const t = useTranslations();
@@ -86,10 +193,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 
 		return (
 			<div className="grid grid-cols-1 gap-10 md:grid-cols-2">
-				{/* Image */}
-				<div className="bg-muted flex aspect-square items-center justify-center rounded-2xl">
-					<Package className="text-muted-foreground/30 h-32 w-32" />
-				</div>
+				{/* Image gallery */}
+				<ProductImageGallery images={product.images ?? []} productName={product.name} />
 
 				{/* Info */}
 				<div className="flex flex-col gap-5">

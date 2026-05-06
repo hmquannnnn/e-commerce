@@ -16,8 +16,10 @@ import { ROUTES } from '@/src/shared/constants/routes';
 import { formatPrice } from '@/src/shared/lib/utils';
 import { useCart } from '@/src/features/cart/api';
 import { useCreateOrder, getOrderErrorCode } from '../api';
+import { useCreatePayment } from '@/src/features/payment/api';
 import type { ICartItem } from '@/src/features/cart/interfaces';
 import type { PaymentMethod } from '../interfaces';
+import type { PaymentMethod as ProviderPaymentMethod, PaymentProvider } from '@/src/features/payment/interfaces';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 
 const CheckoutSkeleton = () => (
@@ -69,7 +71,13 @@ const CheckoutPage = () => {
 	const isAuthenticated = useAppSelector((state) => !!state.auth.accessToken);
 	const { data: cart, isLoading, isError, refetch } = useCart();
 	const createOrder = useCreateOrder();
+	const createPayment = useCreatePayment();
 	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
+	// Controls the entire submit → order → payment → redirect lifecycle.
+	// While true the component renders a processing state, preventing any
+	// flash to empty-cart or skeleton caused by the cart being invalidated
+	// after order creation.
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const resolvedLines = useMemo(() => {
 		if (!draftLines?.length) return [];
@@ -85,7 +93,7 @@ const CheckoutPage = () => {
 	}, [cart, draftLines]);
 
 	useEffect(() => {
-		if (!isAuthenticated || isLoading) return;
+		if (!isAuthenticated || isLoading || isSubmitting) return;
 		if (!draftLines?.length) {
 			router.push(ROUTES.CART);
 			return;
@@ -96,12 +104,91 @@ const CheckoutPage = () => {
 			dispatch(clearCheckoutDraft());
 			router.push(ROUTES.CART);
 		}
-	}, [isAuthenticated, isLoading, draftLines, cart, resolvedLines, router, dispatch, t]);
+	}, [isAuthenticated, isLoading, isSubmitting, draftLines, cart, resolvedLines, router, dispatch, t]);
 
 	const selectedSubtotal = useMemo(() => {
 		if (!resolvedLines?.length) return 0;
 		return resolvedLines.reduce((s, { item, quantity }) => s + item.unit_price * quantity, 0);
 	}, [resolvedLines]);
+
+	// ── Callbacks ────────────────────────────────────────────────────────────
+
+	const createProviderPayment = (orderId: string, amount: number, _method: PaymentMethod) => {
+		const provider: PaymentProvider = 'payos';
+		const providerPaymentMethod: ProviderPaymentMethod = 'qr_code';
+		const origin = window.location.origin;
+		const resultBase = `${origin}/${locale}${ROUTES.PAYMENT.RESULT}?orderId=${orderId}`;
+		createPayment.mutate(
+			{
+				order_id: orderId,
+				provider,
+				payment_method: providerPaymentMethod,
+				amount: Math.round(amount),
+				currency: 'VND',
+				return_url: `${resultBase}&state=success`,
+				cancel_url: `${resultBase}&state=cancel`,
+			},
+			{
+				onSuccess: (payment) => {
+					if (!payment.checkout_url) {
+						toast.error(t('order.payment_error_generic'));
+						setIsSubmitting(false);
+						router.push(ROUTES.ORDERS.DETAIL(orderId));
+						return;
+					}
+					dispatch(clearCheckoutDraft());
+					window.location.assign(payment.checkout_url);
+				},
+				onError: () => {
+					toast.error(t('order.payment_error_generic'));
+					setIsSubmitting(false);
+					router.push(ROUTES.ORDERS.DETAIL(orderId));
+				},
+			}
+		);
+	};
+
+	const handleSubmit = () => {
+		if (!draftLines?.length || !resolvedLines?.length) return;
+
+		setIsSubmitting(true);
+
+		const items = resolvedLines.map(({ item, quantity }) => ({
+			product_id: item.product_id,
+			quantity,
+		}));
+
+		// Order-service persists the chosen method as-is (CASH | QR_CODE).
+		// Provider routing happens only when we actually create a payment intent.
+		createOrder.mutate(
+			{ payment_method: paymentMethod, items },
+			{
+				onSuccess: (order) => {
+					toast.success(t('order.place_order_success'));
+
+					if (paymentMethod === 'CASH') {
+						dispatch(clearCheckoutDraft());
+						router.push(ROUTES.ORDERS.DETAIL(order.id));
+						return;
+					}
+
+					createProviderPayment(order.id, order.total_price, paymentMethod);
+				},
+				onError: (err) => {
+					setIsSubmitting(false);
+					const code = getOrderErrorCode(err);
+					if (code === 'CART_EMPTY') toast.error(t('order.error_cart_empty'));
+					else if (code === 'INVALID_ORDER_ITEMS') toast.error(t('order.error_invalid_order_items'));
+					else if (code === 'CART_CHANGED') toast.error(t('order.error_cart_changed'));
+					else if (code === 'INSUFFICIENT_STOCK') toast.error(t('order.error_stock'));
+					else if (code === 'PRODUCT_NOT_FOUND') toast.error(t('order.error_product'));
+					else toast.error(t('order.place_order_error'));
+				},
+			}
+		);
+	};
+
+	// ── Render guards ────────────────────────────────────────────────────────
 
 	if (!isAuthenticated) {
 		return (
@@ -111,6 +198,17 @@ const CheckoutPage = () => {
 				<Button asChild>
 					<Link href={`/${locale}${ROUTES.AUTH.LOGIN}`}>{t('common.login')}</Link>
 				</Button>
+			</div>
+		);
+	}
+
+	// Processing state — shown while creating order + waiting for payment
+	// provider checkout URL. Prevents any cart-empty flash.
+	if (isSubmitting) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-4 py-24">
+				<Loader2 className="text-primary h-10 w-10 animate-spin" />
+				<p className="text-muted-foreground">{t('order.placing')}</p>
 			</div>
 		);
 	}
@@ -140,34 +238,6 @@ const CheckoutPage = () => {
 	const isEmpty = !cart || cart.items.length === 0;
 	const invalid = resolvedLines === null;
 	const showContent = Boolean(!isEmpty && !invalid && resolvedLines && resolvedLines.length > 0);
-
-	const handleSubmit = () => {
-		if (!draftLines?.length || !resolvedLines?.length) return;
-		const items = resolvedLines.map(({ item, quantity }) => ({
-			product_id: item.product_id,
-			quantity,
-		}));
-
-		createOrder.mutate(
-			{ payment_method: paymentMethod, items },
-			{
-				onSuccess: (order) => {
-					dispatch(clearCheckoutDraft());
-					toast.success(t('order.place_order_success'));
-					router.push(ROUTES.ORDERS.DETAIL(order.id));
-				},
-				onError: (err) => {
-					const code = getOrderErrorCode(err);
-					if (code === 'CART_EMPTY') toast.error(t('order.error_cart_empty'));
-					else if (code === 'INVALID_ORDER_ITEMS') toast.error(t('order.error_invalid_order_items'));
-					else if (code === 'CART_CHANGED') toast.error(t('order.error_cart_changed'));
-					else if (code === 'INSUFFICIENT_STOCK') toast.error(t('order.error_stock'));
-					else if (code === 'PRODUCT_NOT_FOUND') toast.error(t('order.error_product'));
-					else toast.error(t('order.place_order_error'));
-				},
-			}
-		);
-	};
 
 	return (
 		<div className="space-y-8">
@@ -217,20 +287,13 @@ const CheckoutPage = () => {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="CASH">{t('order.payment_cash')}</SelectItem>
-									<SelectItem value="VNPAY">{t('order.payment_vnpay')}</SelectItem>
+									<SelectItem value="QR_CODE">{t('order.payment_qr_code')}</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 
-						<Button className="w-full" size="lg" onClick={handleSubmit} disabled={createOrder.isPending}>
-							{createOrder.isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									{t('order.placing')}
-								</>
-							) : (
-								t('order.place_order')
-							)}
+						<Button className="w-full" size="lg" onClick={handleSubmit} disabled={isSubmitting}>
+							{t('order.place_order')}
 						</Button>
 					</div>
 				</div>
