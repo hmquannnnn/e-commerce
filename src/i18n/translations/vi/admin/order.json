@@ -1,0 +1,20 @@
+{
+	"order": {
+		"all": "Tất cả",
+		"customer": "Khách hàng",
+		"date": "Ngày",
+		"empty": "Không có đơn hàng phù hợp.",
+		"filter_status": "Lọc theo trạng thái",
+		"id": "Mã đơn",
+		"items": "SP",
+		"load_error": "Không thể tải đơn hàng.",
+		"orders": "Đơn hàng",
+		"payment_method": "Phương thức",
+		"status": "Trạng thái",
+		"total": "Tổng tiền",
+		"update_error": "Không thể cập nhật trạng thái",
+		"update_invalid_transition": "Không thể chuyển sang trạng thái này",
+		"update_status": "Cập nhật trạng thái",
+		"update_success": "Đã cập nhật trạng thái đơn"
+	}
+}

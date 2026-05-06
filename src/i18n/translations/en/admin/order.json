@@ -1,0 +1,20 @@
+{
+	"order": {
+		"all": "All",
+		"customer": "Customer",
+		"date": "Date",
+		"empty": "No orders match the current filter.",
+		"filter_status": "Filter by status",
+		"id": "Order ID",
+		"items": "Items",
+		"load_error": "Failed to load orders.",
+		"orders": "Orders",
+		"payment_method": "Method",
+		"status": "Status",
+		"total": "Total",
+		"update_error": "Failed to update order status",
+		"update_invalid_transition": "This status transition is not allowed",
+		"update_status": "Update status",
+		"update_success": "Order status updated"
+	}
+}

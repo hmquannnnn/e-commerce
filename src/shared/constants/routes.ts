@@ -6,6 +6,9 @@ export const ROUTES = {
 		LIST: '/orders',
 		DETAIL: (id: string) => `/orders/${id}`,
 	},
+	PAYMENT: {
+		RESULT: '/payment/result',
+	},
 	AUTH: {
 		LOGIN: '/auth/login',
 		REGISTER: '/auth/register',
@@ -19,6 +22,10 @@ export const ROUTES = {
 			NEW: '/admin/products/new',
 			DETAIL: (id: string) => `/admin/products/${id}`,
 			EDIT: (id: string) => `/admin/products/${id}/edit`,
+		},
+		ORDERS: {
+			LIST: '/admin/orders',
+			DETAIL: (id: string) => `/admin/orders/${id}`,
 		},
 	},
 };
