@@ -1,3 +1,1 @@
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }> {
-	
-}
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }> {}

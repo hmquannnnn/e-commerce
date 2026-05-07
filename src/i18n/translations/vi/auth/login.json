@@ -2,9 +2,9 @@
 	"login": {
 		"email_is_required": "Email không được để trống",
 		"invalid_email_format": "Email không hợp lệ",
+		"invalid_password_format": "Mật khẩu phải chứa ít nhất 1 chữ cái in hoa, 1 chữ cái thường, 1 số và 1 ký tự đặc biệt",
 		"password_is_required": "Mật khẩu không được để trống",
 		"password_must_be_at_least_8_characters_long": "Mật khẩu phải có ít nhất 8 ký tự",
-		"invalid_password_format": "Mật khẩu phải chứa ít nhất 1 chữ cái in hoa, 1 chữ cái thường, 1 số và 1 ký tự đặc biệt",
 		"please_enter_your_email": "Vui lòng nhập email của bạn",
 		"please_enter_your_password": "Vui lòng nhập mật khẩu của bạn"
 	}

@@ -69,7 +69,7 @@ export default defineConfig([
 			// Enforce tabs (size 2) via Prettier integration and disallow mixing
 			'prettier/prettier': ['error', { useTabs: true, tabWidth: 2 }],
 			'no-mixed-spaces-and-tabs': 'error',
-			'no-console': ['warn', { allow: ['warn', 'error'] }],
+			'no-console': ['error', { allow: ['warn', 'error'] }],
 			semi: ['error', 'always'],
 		},
 	},

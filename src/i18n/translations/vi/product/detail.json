@@ -1,0 +1,9 @@
+{
+	"detail": {
+		"back_to_products": "Quay lại danh sách",
+		"description": "Mô tả sản phẩm",
+		"load_error": "Không thể tải thông tin sản phẩm",
+		"not_found": "Không tìm thấy sản phẩm",
+		"specifications": "Thông số kỹ thuật"
+	}
+}

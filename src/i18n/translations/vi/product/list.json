@@ -1,0 +1,11 @@
+{
+	"list": {
+		"add_to_cart": "Thêm vào giỏ hàng",
+		"all_categories": "Tất cả",
+		"clear_filters": "Xóa bộ lọc",
+		"load_error": "Không thể tải danh sách sản phẩm",
+		"no_products": "Không tìm thấy sản phẩm nào",
+		"search_placeholder": "Tìm kiếm sản phẩm...",
+		"showing_count": "Hiển thị {count} / {total} sản phẩm"
+	}
+}

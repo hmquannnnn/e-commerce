@@ -1,0 +1,28 @@
+{
+	"cart": {
+		"add_error": "Không thể thêm vào giỏ hàng",
+		"add_success": "Đã thêm vào giỏ hàng",
+		"adding": "Đang thêm...",
+		"checkout": "Đặt hàng",
+		"checkout_select_at_least_one": "Chọn ít nhất một sản phẩm để thanh toán.",
+		"continue_shopping": "Tiếp tục mua sắm",
+		"decrease_qty": "Giảm số lượng",
+		"empty_description": "Hãy thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm.",
+		"empty_title": "Giỏ hàng trống",
+		"in_cart_qty": "Trong giỏ",
+		"increase_qty": "Tăng số lượng",
+		"item_count": "{count} sản phẩm",
+		"load_error": "Không thể tải giỏ hàng",
+		"login_required": "Vui lòng đăng nhập để xem giỏ hàng",
+		"order_qty_label": "Số lượng đặt",
+		"remove": "Xóa sản phẩm",
+		"select_all_checkbox_aria": "Chọn tất cả, bỏ chọn tất cả hoặc trạng thái chọn một phần",
+		"select_all_checkbox_label": "Chọn cho đơn hàng",
+		"select_for_checkout_hint": "Chọn sản phẩm và số lượng đưa vào đơn hàng, rồi bấm Đặt hàng để sang bước thanh toán.",
+		"selected_for_order": "{count} dòng đặt hàng",
+		"selected_subtotal": "Tạm tính (đã chọn)",
+		"summary": "Tóm tắt đơn hàng",
+		"title": "Giỏ hàng",
+		"total": "Tổng cộng"
+	}
+}

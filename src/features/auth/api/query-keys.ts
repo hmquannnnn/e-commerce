@@ -1,3 +1,1 @@
-export const AUTH_QUERY_KEYS = {
-
-} as const;
+export const AUTH_QUERY_KEYS = {} as const;

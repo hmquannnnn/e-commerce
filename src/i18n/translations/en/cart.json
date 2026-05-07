@@ -1,0 +1,28 @@
+{
+	"cart": {
+		"add_error": "Failed to add to cart",
+		"add_success": "Added to cart",
+		"adding": "Adding...",
+		"checkout": "Place Order",
+		"checkout_select_at_least_one": "Select at least one product to checkout.",
+		"continue_shopping": "Continue Shopping",
+		"decrease_qty": "Decrease quantity",
+		"empty_description": "Add some products to your cart to start shopping.",
+		"empty_title": "Your cart is empty",
+		"in_cart_qty": "In cart",
+		"increase_qty": "Increase quantity",
+		"item_count": "{count} items",
+		"load_error": "Failed to load cart",
+		"login_required": "Please log in to view your cart",
+		"order_qty_label": "Order qty",
+		"remove": "Remove item",
+		"select_all_checkbox_aria": "Select all, unselect all, or partially selected",
+		"select_all_checkbox_label": "Select for order",
+		"select_for_checkout_hint": "Choose items and quantities for this order, then tap Place order to continue to checkout.",
+		"selected_for_order": "{count} line(s) for order",
+		"selected_subtotal": "Subtotal (selected)",
+		"summary": "Order Summary",
+		"title": "Cart",
+		"total": "Total"
+	}
+}
