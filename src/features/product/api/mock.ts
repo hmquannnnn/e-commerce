@@ -239,6 +239,16 @@ export const getMockProducts = async (params: IListProductsQuery): Promise<IProd
 		);
 	}
 
+	const minPrice = params.min_price;
+	if (minPrice !== undefined) {
+		filtered = filtered.filter((p) => p.price >= minPrice);
+	}
+
+	const maxPrice = params.max_price;
+	if (maxPrice !== undefined) {
+		filtered = filtered.filter((p) => p.price <= maxPrice);
+	}
+
 	const page = params.page ?? 1;
 	const limit = params.limit ?? 12;
 	const total = filtered.length;

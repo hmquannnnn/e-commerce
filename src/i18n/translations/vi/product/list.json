@@ -2,9 +2,15 @@
 	"list": {
 		"add_to_cart": "Thêm vào giỏ hàng",
 		"all_categories": "Tất cả",
+		"apply_filters": "Áp dụng",
 		"clear_filters": "Xóa bộ lọc",
 		"load_error": "Không thể tải danh sách sản phẩm",
+		"max_price_placeholder": "Giá tối đa",
+		"min_price_placeholder": "Giá tối thiểu",
 		"no_products": "Không tìm thấy sản phẩm nào",
+		"price_filter": "Khoảng giá",
+		"price_invalid": "Giá phải là số không âm",
+		"price_range_invalid": "Giá tối thiểu không được lớn hơn giá tối đa",
 		"search_placeholder": "Tìm kiếm sản phẩm...",
 		"showing_count": "Hiển thị {count} / {total} sản phẩm"
 	}

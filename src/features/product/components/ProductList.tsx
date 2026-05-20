@@ -17,9 +17,28 @@ import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { useProducts, useCategories } from '../api';
 import ProductCard from './ProductCard';
-import { Search, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, AlertCircle, RefreshCw, SlidersHorizontal, X } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 12;
+
+const stripPriceInput = (value: string) => value.replace(/[^\d]/g, '');
+
+const formatPriceInput = (value: string): string => {
+	const digits = stripPriceInput(value);
+	if (!digits) return '';
+
+	return new Intl.NumberFormat('en-US').format(Number(digits));
+};
+
+const parseOptionalPrice = (value: string): number | null | undefined => {
+	const digits = stripPriceInput(value);
+	if (!digits) return undefined;
+
+	const parsed = Number(digits);
+	if (!Number.isFinite(parsed) || parsed < 0) return null;
+
+	return parsed;
+};
 
 const ProductCardSkeleton = () => (
 	<div className="flex flex-col overflow-hidden rounded-xl border">
@@ -49,6 +68,11 @@ const ProductList = () => {
 	const [searchInput, setSearchInput] = useState('');
 	const [search, setSearch] = useState('');
 	const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
+	const [minPriceInput, setMinPriceInput] = useState('');
+	const [maxPriceInput, setMaxPriceInput] = useState('');
+	const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+	const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+	const [priceError, setPriceError] = useState<string | null>(null);
 
 	const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 	const { data, isLoading, isError, refetch } = useProducts({
@@ -56,9 +80,13 @@ const ProductList = () => {
 		limit: ITEMS_PER_PAGE,
 		search: search || undefined,
 		category_id: categoryId,
+		min_price: minPrice,
+		max_price: maxPrice,
 	});
 
 	const categoryMap = new Map(categoriesData?.map((c) => [c.id, c.name]) ?? []);
+	const hasPriceFilter = minPrice !== undefined || maxPrice !== undefined;
+	const hasActiveFilters = Boolean(search || categoryId !== undefined || hasPriceFilter);
 
 	const handleSearch = useCallback(() => {
 		setSearch(searchInput.trim());
@@ -76,6 +104,53 @@ const ProductList = () => {
 		setCategoryId(id);
 		setPage(1);
 	};
+
+	const handleMinPriceChange = useCallback((value: string) => {
+		setMinPriceInput(formatPriceInput(value));
+	}, []);
+
+	const handleMaxPriceChange = useCallback((value: string) => {
+		setMaxPriceInput(formatPriceInput(value));
+	}, []);
+
+	const handlePriceApply = useCallback(() => {
+		const parsedMinPrice = parseOptionalPrice(minPriceInput);
+		const parsedMaxPrice = parseOptionalPrice(maxPriceInput);
+
+		if (parsedMinPrice === null || parsedMaxPrice === null) {
+			setPriceError(t('product.list.price_invalid'));
+			return;
+		}
+
+		if (parsedMinPrice !== undefined && parsedMaxPrice !== undefined && parsedMinPrice > parsedMaxPrice) {
+			setPriceError(t('product.list.price_range_invalid'));
+			return;
+		}
+
+		setPriceError(null);
+		setMinPrice(parsedMinPrice);
+		setMaxPrice(parsedMaxPrice);
+		setPage(1);
+	}, [maxPriceInput, minPriceInput, t]);
+
+	const handlePriceKeyDown = useCallback(
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (e.key === 'Enter') handlePriceApply();
+		},
+		[handlePriceApply]
+	);
+
+	const handleClearFilters = useCallback(() => {
+		setSearch('');
+		setSearchInput('');
+		setCategoryId(undefined);
+		setMinPriceInput('');
+		setMaxPriceInput('');
+		setMinPrice(undefined);
+		setMaxPrice(undefined);
+		setPriceError(null);
+		setPage(1);
+	}, []);
 
 	const totalPages = data?.total_pages ?? 1;
 	const paginationRange = getPaginationRange(page, totalPages);
@@ -109,16 +184,8 @@ const ProductList = () => {
 				<div className="flex flex-col items-center justify-center gap-3 py-20">
 					<Search className="text-muted-foreground/40 h-16 w-16" />
 					<p className="text-muted-foreground font-medium">{t('product.list.no_products')}</p>
-					{(search || categoryId) && (
-						<Button
-							variant="ghost"
-							onClick={() => {
-								setSearch('');
-								setSearchInput('');
-								setCategoryId(undefined);
-								setPage(1);
-							}}
-						>
+					{hasActiveFilters && (
+						<Button variant="ghost" onClick={handleClearFilters}>
 							{t('product.list.clear_filters')}
 						</Button>
 					)}
@@ -161,6 +228,56 @@ const ProductList = () => {
 				<Button onClick={handleSearch} variant="default">
 					{t('common.search')}
 				</Button>
+			</div>
+
+			{/* Price filter */}
+			<div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+				<div className="text-muted-foreground flex h-9 items-center gap-2 text-sm font-medium">
+					<SlidersHorizontal className="h-4 w-4" />
+					{t('product.list.price_filter')}
+				</div>
+				<div className="flex flex-1 flex-col gap-2 md:max-w-2xl">
+					<div className="flex flex-col gap-2 sm:flex-row">
+						<Input
+							type="text"
+							inputMode="numeric"
+							placeholder={t('product.list.min_price_placeholder')}
+							value={minPriceInput}
+							onChange={(e) => handleMinPriceChange(e.target.value)}
+							onKeyDown={handlePriceKeyDown}
+							aria-invalid={!!priceError}
+							className="h-9 sm:w-40"
+						/>
+						<Input
+							type="text"
+							inputMode="numeric"
+							placeholder={t('product.list.max_price_placeholder')}
+							value={maxPriceInput}
+							onChange={(e) => handleMaxPriceChange(e.target.value)}
+							onKeyDown={handlePriceKeyDown}
+							aria-invalid={!!priceError}
+							className="h-9 sm:w-40"
+						/>
+						<div className="flex gap-2">
+							<Button onClick={handlePriceApply} variant="outline" className="h-9 flex-1 gap-2 sm:flex-none">
+								<SlidersHorizontal className="h-4 w-4" />
+								{t('product.list.apply_filters')}
+							</Button>
+							{hasActiveFilters && (
+								<Button
+									onClick={handleClearFilters}
+									variant="ghost"
+									size="icon"
+									className="h-9 w-9 shrink-0"
+									aria-label={t('product.list.clear_filters')}
+								>
+									<X className="h-4 w-4" />
+								</Button>
+							)}
+						</div>
+					</div>
+					{priceError && <p className="text-destructive text-sm">{priceError}</p>}
+				</div>
 			</div>
 
 			{/* Category filter */}
