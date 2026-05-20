@@ -50,6 +50,10 @@ const initializeApiClientInstance = (
 		...configs,
 	});
 
+	if (/\.ngrok-free\.dev|\.ngrok\.app|\.ngrok\.io(?:\/|$)/i.test(baseURL)) {
+		apiClient.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
+	}
+
 	if (includeAuthHeader) {
 		apiClient.interceptors.request.use((config) => {
 			const tokenFromStore = (() => {

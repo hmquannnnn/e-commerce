@@ -1,0 +1,121 @@
+{
+	"specs": {
+		"fields": {
+			"accessory": {
+				"compatible_models": "Dòng UAV tương thích",
+				"main_function": "Công dụng chính",
+				"type": "Loại phụ kiện"
+			},
+			"aircraft": {
+				"dimensions": "Kích thước",
+				"gnss": "Hệ thống định vị",
+				"hovering_accuracy": "Độ chính xác lơ lửng",
+				"max_flight_time": "Thời gian bay tối đa",
+				"max_speed": "Tốc độ bay tối đa",
+				"max_takeoff_altitude": "Độ cao cất cánh tối đa",
+				"max_takeoff_weight": "Trọng lượng cất cánh tối đa",
+				"max_transmission_distance": "Khoảng cách truyền tối đa",
+				"max_wind_resistance": "Kháng gió tối đa",
+				"operating_temperature": "Nhiệt độ hoạt động",
+				"rtk_gnss": "RTK/GNSS",
+				"weight": "Trọng lượng"
+			},
+			"battery": {
+				"battery_type": "Loại pin",
+				"capacity": "Dung lượng pin",
+				"charging_time": "Thời gian sạc",
+				"model": "Model pin",
+				"voltage": "Điện áp pin",
+				"weight": "Trọng lượng pin"
+			},
+			"camera": {
+				"aperture": "Khẩu độ",
+				"digital_zoom": "Zoom kỹ thuật số",
+				"lens": "Ống kính",
+				"max_photo_resolution": "Độ phân giải ảnh tối đa",
+				"max_video_resolution": "Độ phân giải video tối đa",
+				"photo_format": "Định dạng ảnh",
+				"sensor": "Cảm biến camera",
+				"video_format": "Định dạng video"
+			},
+			"gimbal": {
+				"controllable_range": "Phạm vi điều khiển",
+				"mechanical_range": "Phạm vi cơ học",
+				"stabilization": "Chống rung"
+			},
+			"package": {
+				"included_items": "Phụ kiện kèm theo",
+				"quantity": "Số lượng"
+			},
+			"physical": {
+				"dimensions": "Kích thước",
+				"material": "Chất liệu",
+				"weight": "Trọng lượng"
+			},
+			"power": {
+				"capacity": "Dung lượng",
+				"charging_time": "Thời gian sạc",
+				"power": "Công suất",
+				"voltage": "Điện áp"
+			},
+			"remote_controller": {
+				"model": "Model bộ điều khiển",
+				"screen": "Màn hình",
+				"transmission_distance": "Khoảng cách truyền"
+			},
+			"sensing": {
+				"backward": "Cảm biến phía sau",
+				"downward": "Cảm biến hướng xuống",
+				"forward": "Cảm biến phía trước",
+				"obstacle_detection_range": "Phạm vi tránh vật cản",
+				"operating_environment": "Môi trường hoạt động",
+				"system": "Hệ thống cảm biến",
+				"terrain_following": "Bám địa hình"
+			},
+			"spraying": {
+				"droplet_size": "Kích thước hạt phun",
+				"max_flow_rate": "Lưu lượng phun tối đa",
+				"nozzle_count": "Số vòi phun",
+				"pump_type": "Loại bơm",
+				"spray_width": "Chiều rộng phun",
+				"tank_capacity": "Dung tích bình phun"
+			},
+			"spreading": {
+				"material_diameter": "Đường kính vật liệu",
+				"payload": "Tải trọng rải",
+				"spreading_width": "Chiều rộng rải",
+				"tank_capacity": "Dung tích thùng rải"
+			},
+			"storage": {
+				"internal_storage": "Bộ nhớ trong",
+				"supported_sd_cards": "Thẻ nhớ hỗ trợ"
+			},
+			"transmission": {
+				"frequency": "Tần số",
+				"live_view_quality": "Chất lượng live view",
+				"system": "Hệ thống truyền"
+			}
+		},
+		"groups": {
+			"accessory": "Phụ kiện",
+			"aircraft": "Máy bay",
+			"battery": "Pin",
+			"camera": "Camera",
+			"gimbal": "Gimbal",
+			"package": "Đóng gói",
+			"physical": "Vật lý",
+			"power": "Nguồn điện",
+			"remote_controller": "Bộ điều khiển",
+			"sensing": "Cảm biến",
+			"spraying": "Hệ thống phun",
+			"spreading": "Hệ thống rải",
+			"storage": "Lưu trữ",
+			"transmission": "Truyền video"
+		},
+		"templates": {
+			"agriculture_uav_v1": "Thông số UAV nông nghiệp",
+			"camera_drone_v1": "Thông số drone quay chụp",
+			"uav_accessory_v1": "Thông số phụ kiện UAV"
+		}
+	}
+}

@@ -23,10 +23,13 @@ import { useProduct, useCategories } from '../api';
 import { ROUTES } from '@/src/shared/constants/routes';
 import { useAddCartItem } from '@/src/features/cart/api';
 import type { IProductImage } from '../interfaces';
+import { getLegacySpecEntries, getProductSpecDisplayGroups, type ProductSpecDisplayGroup } from '../specs/templates';
 
 interface ProductDetailProps {
 	id: string;
 }
+
+type TranslationFn = ReturnType<typeof useTranslations>;
 
 const ProductDetailSkeleton = () => (
 	<div className="grid grid-cols-1 gap-10 md:grid-cols-2">
@@ -142,6 +145,57 @@ const ProductImageGallery = ({ images, productName }: { images: IProductImage[];
 	);
 };
 
+const ProductSpecsSection = ({
+	groups,
+	legacySpecs,
+	t,
+}: {
+	groups: ProductSpecDisplayGroup[];
+	legacySpecs: { key: string; value: string }[];
+	t: TranslationFn;
+}) => {
+	if (groups.length > 0) {
+		return (
+			<div className="space-y-4">
+				<h2 className="font-semibold">{t('product.detail.specifications')}</h2>
+				<div className="space-y-4">
+					{groups.map((group) => (
+						<div key={group.key} className="overflow-hidden rounded-lg border">
+							<div className="bg-muted/50 px-4 py-2.5 text-sm font-semibold">{t(group.labelKey)}</div>
+							<div className="divide-y">
+								{group.fields.map((field) => (
+									<div key={field.key} className="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[minmax(0,0.42fr)_1fr]">
+										<span className="text-muted-foreground">{t(field.labelKey)}</span>
+										<span className="font-medium">{field.value}</span>
+									</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	if (legacySpecs.length > 0) {
+		return (
+			<div className="space-y-3">
+				<h2 className="font-semibold">{t('product.detail.specifications')}</h2>
+				<div className="rounded-lg border">
+					{legacySpecs.map((spec, idx) => (
+						<div key={spec.key} className={cn('flex px-4 py-2.5 text-sm', idx % 2 === 0 && 'bg-muted/50')}>
+							<span className="text-muted-foreground w-2/5 capitalize">{spec.key}</span>
+							<span className="w-3/5 font-medium">{spec.value}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	return null;
+};
+
 const ProductDetail = ({ id }: ProductDetailProps) => {
 	const t = useTranslations();
 	const locale = useLocale();
@@ -189,7 +243,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 			);
 		}
 
-		const specs = product.specs && typeof product.specs === 'object' ? Object.entries(product.specs) : [];
+		const specGroups = getProductSpecDisplayGroups(product.specs, product.category_id);
+		const legacySpecs = specGroups.length > 0 ? [] : getLegacySpecEntries(product.specs);
 
 		return (
 			<div className="grid grid-cols-1 gap-10 md:grid-cols-2">
@@ -221,19 +276,7 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 					)}
 
 					{/* Specs */}
-					{specs.length > 0 && (
-						<div className="space-y-3">
-							<h2 className="font-semibold">{t('product.detail.specifications')}</h2>
-							<div className="rounded-lg border">
-								{specs.map(([key, value], idx) => (
-									<div key={key} className={`flex px-4 py-2.5 text-sm ${idx % 2 === 0 ? 'bg-muted/50' : ''}`}>
-										<span className="text-muted-foreground w-2/5 capitalize">{key}</span>
-										<span className="w-3/5 font-medium">{String(value)}</span>
-									</div>
-								))}
-							</div>
-						</div>
-					)}
+					<ProductSpecsSection groups={specGroups} legacySpecs={legacySpecs} t={t} />
 
 					{/* Actions */}
 					<div className="mt-auto pt-2">

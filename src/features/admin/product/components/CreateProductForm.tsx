@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch, type Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -12,7 +12,6 @@ import { Button } from '@/src/shared/components/base/ui/button';
 import { Input } from '@/src/shared/components/base/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/components/base/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
-import { cn } from '@/src/shared/lib/utils';
 
 import { createProductSchema, CreateProductFormValues } from '../schema';
 import { useCreateProduct, useGenerateProductId } from '../api';
@@ -20,12 +19,22 @@ import { useImageUpload } from '../hooks/useImageUpload';
 import { ICategory } from '@/src/features/product/interfaces';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
+import {
+	buildProductSpecsPayload,
+	createEmptySpecsForTemplate,
+	getSpecTemplateByCategoryId,
+} from '@/src/features/product/specs/templates';
 
 interface CreateProductFormProps {
 	categories: ICategory[];
 }
 
 type TranslationFn = ReturnType<typeof useTranslations>;
+
+const toInputValue = (value: unknown) => {
+	if (typeof value === 'string' || typeof value === 'number') return value;
+	return '';
+};
 
 function renderSubmitLabel({
 	isPending,
@@ -71,6 +80,8 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 	const {
 		control,
 		handleSubmit,
+		setValue,
+		clearErrors,
 		formState: { errors },
 	} = useForm<CreateProductFormValues>({
 		resolver: zodResolver(schema),
@@ -79,9 +90,12 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 			description: '',
 			price: '',
 			category_id: '',
-			specs: '',
+			specs: {},
 		},
 	});
+
+	const selectedCategoryId = useWatch({ control, name: 'category_id' });
+	const selectedSpecTemplate = useMemo(() => getSpecTemplateByCategoryId(selectedCategoryId), [selectedCategoryId]);
 
 	const { mutate: createProduct, isPending } = useCreateProduct();
 
@@ -95,15 +109,8 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 			return;
 		}
 
-		let specs: Record<string, string> | undefined;
-		if (formData.specs && formData.specs.trim()) {
-			try {
-				specs = JSON.parse(formData.specs);
-			} catch {
-				toast.error(t('admin.product.specs_invalid_json'));
-				return;
-			}
-		}
+		const categoryId = Number(formData.category_id);
+		const specs = buildProductSpecsPayload(categoryId, formData.specs);
 
 		createProduct(
 			{
@@ -111,7 +118,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 				name: formData.name,
 				description: formData.description || undefined,
 				price: Number(formData.price),
-				category_id: formData.category_id ? Number(formData.category_id) : undefined,
+				category_id: categoryId,
 				specs,
 				images: uploadedImages.map((img) => ({
 					url: img.public_url!,
@@ -190,28 +197,94 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 							/>
 						</div>
 
-						{/* Specs JSON */}
+						{/* Category */}
 						<div>
 							<label className="mb-1.5 block text-sm font-medium">
-								{t('admin.product.specs')}
-								<span className="text-muted-foreground ml-1 text-xs">(JSON)</span>
+								{t('admin.product.category')} <span className="text-destructive">*</span>
 							</label>
 							<Controller
-								name="specs"
+								name="category_id"
 								control={control}
 								render={({ field }) => (
-									<textarea
-										{...field}
-										rows={4}
-										placeholder='{"weight": "1.2kg", "battery": "5000mAh"}'
-										className={cn(
-											'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-											errors.specs && 'border-destructive'
-										)}
-									/>
+									<Select
+										value={field.value?.toString() ?? ''}
+										onValueChange={(value) => {
+											field.onChange(value);
+											const template = getSpecTemplateByCategoryId(value);
+											setValue('specs', template ? createEmptySpecsForTemplate(template) : {}, {
+												shouldDirty: true,
+												shouldValidate: true,
+											});
+											clearErrors('specs');
+										}}
+									>
+										<SelectTrigger aria-invalid={!!errors.category_id}>
+											<SelectValue placeholder={t('admin.product.select_category')} />
+										</SelectTrigger>
+										<SelectContent>
+											{categories.map((cat) => (
+												<SelectItem key={cat.id} value={cat.id.toString()}>
+													{cat.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
 								)}
 							/>
-							{errors.specs && <p className="text-destructive mt-1.5 text-sm">{errors.specs.message}</p>}
+							{errors.category_id && <p className="text-destructive mt-1.5 text-sm">{errors.category_id.message}</p>}
+						</div>
+
+						{/* Specs */}
+						<div>
+							<div className="mb-3 flex items-center justify-between gap-3">
+								<label className="block text-sm font-medium">
+									{t('admin.product.specs')} <span className="text-destructive">*</span>
+								</label>
+								{selectedSpecTemplate && (
+									<span className="text-muted-foreground text-xs">{t(selectedSpecTemplate.labelKey)}</span>
+								)}
+							</div>
+							{selectedSpecTemplate ? (
+								<div className="space-y-5">
+									{selectedSpecTemplate.groups.map((group) => (
+										<div key={group.key} className="rounded-lg border p-4">
+											<h3 className="mb-3 text-sm font-semibold">{t(group.labelKey)}</h3>
+											<div className="grid gap-3 sm:grid-cols-2">
+												{group.fields.map((specField) => {
+													const fieldPath = `specs.${group.key}.${specField.key}` as Path<CreateProductFormValues>;
+													const specError = errors.specs?.[group.key]?.[specField.key];
+
+													return (
+														<div key={specField.key}>
+															<label className="mb-1.5 block text-sm font-medium">
+																{t(specField.labelKey)}
+																{specField.required && <span className="text-destructive"> *</span>}
+															</label>
+															<Controller
+																name={fieldPath}
+																control={control}
+																render={({ field }) => (
+																	<Input
+																		{...field}
+																		value={toInputValue(field.value)}
+																		placeholder={t('admin.product.spec_value_placeholder')}
+																		aria-invalid={!!specError}
+																	/>
+																)}
+															/>
+															{specError && <p className="text-destructive mt-1.5 text-sm">{specError.message}</p>}
+														</div>
+													);
+												})}
+											</div>
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="border-input text-muted-foreground rounded-lg border border-dashed px-4 py-6 text-sm">
+									{t('admin.product.select_category_for_specs')}
+								</div>
+							)}
 						</div>
 					</CardContent>
 				</Card>
@@ -344,29 +417,6 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 								)}
 							/>
 							{errors.price && <p className="text-destructive mt-1.5 text-sm">{errors.price.message}</p>}
-						</div>
-
-						{/* Category */}
-						<div>
-							<label className="mb-1.5 block text-sm font-medium">{t('admin.product.category')}</label>
-							<Controller
-								name="category_id"
-								control={control}
-								render={({ field }) => (
-									<Select value={field.value?.toString() ?? ''} onValueChange={field.onChange}>
-										<SelectTrigger>
-											<SelectValue placeholder={t('admin.product.select_category')} />
-										</SelectTrigger>
-										<SelectContent>
-											{categories.map((cat) => (
-												<SelectItem key={cat.id} value={cat.id.toString()}>
-													{cat.name}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								)}
-							/>
 						</div>
 					</CardContent>
 				</Card>

@@ -7,7 +7,8 @@ import { IGetPresignedUrlResponse, IProductImageFormItem } from '../interfaces';
 
 const authClient = initializeApiClientInstance({});
 
-const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_BASE_URL ?? 'http://localhost:9000';
+const STORAGE_BASE_URL =
+	process.env.NEXT_PUBLIC_STORAGE_BASE_URL ?? process.env.NEXT_PUBLIC_MINIO_PUBLIC_URL ?? 'http://localhost:9000';
 
 const getPresignedUrl = async (productId: string, contentType: string): Promise<IGetPresignedUrlResponse> =>
 	authClient

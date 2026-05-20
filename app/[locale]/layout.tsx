@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: 'UAV Shop',
 	description: 'UAV Shop',
+	icons: {
+		icon: '/favicon.svg',
+	},
 };
 
 /**
