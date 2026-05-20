@@ -4,6 +4,9 @@ pipeline {
     environment {
         DOCKERHUB_USER = 'hmquannnnn'
         IMAGE_NAME     = 'uav-store-fe'
+        GITOPS_REPO    = 'hmquannnnn/uav-store-infra'
+        GITOPS_BRANCH  = 'dev'
+        GITOPS_DIR     = 'gitops-repo'
     }
 
     stages {
@@ -52,7 +55,7 @@ pipeline {
             agent {
                 docker {
                     image 'docker:24-cli'
-                    args  '-v /var/run/docker.sock:/var/run/docker.sock -u root'
+                    args  "--entrypoint='' -v /var/run/docker.sock:/var/run/docker.sock -u root"
                     reuseNode true
                 }
             }
@@ -74,6 +77,44 @@ pipeline {
                         sh 'docker logout'
                         echo "Pushed ${img}:latest and ${img}:${sha}"
                     }
+                }
+            }
+        }
+
+        stage('Update K8s Manifest') {
+            steps {
+                script {
+                    def sha = env.GIT_SHA
+                    def img = "${DOCKERHUB_USER}/${IMAGE_NAME}"
+                    def gitopsDir = env.GITOPS_DIR
+                    def branch = env.GITOPS_BRANCH
+                    def gitopsRepo = env.GITOPS_REPO
+
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github-credentials',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )]) {
+                        dir(gitopsDir) {
+                            deleteDir()
+                        }
+
+                        sh "git clone --branch ${branch} https://\${GIT_USER}:\${GIT_TOKEN}@github.com/${gitopsRepo}.git ${gitopsDir}"
+                        sh "sed -i 's|image: .*${IMAGE_NAME}.*|image: ${img}:${sha}|g' ${gitopsDir}/deployment/k8s/20-frontend.yaml"
+
+                        sh """
+                            cd ${gitopsDir}
+                            git config user.email "jenkins@uav-store"
+                            git config user.name "Jenkins"
+
+                            git add deployment/k8s/20-frontend.yaml
+                            git diff --staged --quiet || git commit -m "ci: update frontend image to ${sha} [ci skip]"
+
+                            git pull --rebase origin ${branch}
+                            git push origin HEAD:${branch}
+                        """
+                    }
+                    echo "Frontend manifest updated to ${sha}"
                 }
             }
         }
