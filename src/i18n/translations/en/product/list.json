@@ -2,9 +2,15 @@
 	"list": {
 		"add_to_cart": "Add to Cart",
 		"all_categories": "All",
+		"apply_filters": "Apply",
 		"clear_filters": "Clear filters",
 		"load_error": "Failed to load products",
+		"max_price_placeholder": "Max price",
+		"min_price_placeholder": "Min price",
 		"no_products": "No products found",
+		"price_filter": "Price range",
+		"price_invalid": "Price must be a non-negative number",
+		"price_range_invalid": "Minimum price cannot be greater than maximum price",
 		"search_placeholder": "Search products...",
 		"showing_count": "Showing {count} / {total} products"
 	}

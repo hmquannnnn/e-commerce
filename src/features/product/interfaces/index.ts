@@ -34,6 +34,8 @@ export interface ICategory {
 export interface IListProductsQuery {
 	category_id?: number;
 	search?: string;
+	min_price?: number;
+	max_price?: number;
 	page?: number;
 	limit?: number;
 }
