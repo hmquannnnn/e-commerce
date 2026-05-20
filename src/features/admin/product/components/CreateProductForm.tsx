@@ -122,7 +122,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 			{
 				onSuccess: (res) => {
 					toast.success(t('admin.product.create_success'));
-					router.push(ROUTES.ADMIN.PRODUCTS.DETAIL(res.id));
+					router.push(ROUTES.ADMIN.PRODUCTS.EDIT(res.id));
 				},
 				onError: () => {
 					toast.error(t('admin.product.create_error'));

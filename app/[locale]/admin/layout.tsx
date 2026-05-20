@@ -2,15 +2,17 @@
 
 import { useEffect } from 'react';
 import { useAppSelector } from '@/src/core/store/store';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { ROUTES } from '@/src/shared/constants/routes';
 import { Loader2 } from 'lucide-react';
 import { Toaster } from '@/src/shared/components/base/ui/sonner';
+import { cn } from '@/src/shared/lib/utils';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 	const user = useAppSelector((s) => s.auth.user);
 	const router = useRouter();
+	const pathname = usePathname();
 	const locale = useLocale();
 	const t = useTranslations();
 
@@ -34,18 +36,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
 	if (!user || user.role !== 'admin') return null;
 
-	const navLinkClass = 'text-muted-foreground hover:text-foreground text-sm transition-colors';
+	const isActive = (path: string) => {
+		const localizedPath = `/${locale}${path}`;
+		return pathname === localizedPath || pathname.startsWith(`${localizedPath}/`);
+	};
+
+	const navLinkClass = (path: string) =>
+		cn(
+			'text-muted-foreground hover:text-foreground text-sm transition-colors',
+			isActive(path) && 'text-foreground font-semibold'
+		);
 
 	return (
 		<>
 			<div className="min-h-screen">
 				<nav className="border-b px-6 py-3">
 					<div className="mx-auto flex max-w-7xl items-center gap-6">
-						<span className="text-sm font-semibold">{t('common.admin')}</span>
-						<a href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`} className={navLinkClass}>
+						<a href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`} className={navLinkClass(ROUTES.ADMIN.PRODUCTS.LIST)}>
 							{t('admin.product.products')}
 						</a>
-						<a href={`/${locale}${ROUTES.ADMIN.ORDERS.LIST}`} className={navLinkClass}>
+						<a
+							href={`/${locale}${ROUTES.ADMIN.CATEGORIES.LIST}`}
+							className={navLinkClass(ROUTES.ADMIN.CATEGORIES.LIST)}
+						>
+							{t('admin.category.categories')}
+						</a>
+						<a href={`/${locale}${ROUTES.ADMIN.ORDERS.LIST}`} className={navLinkClass(ROUTES.ADMIN.ORDERS.LIST)}>
 							{t('admin.order.orders')}
 						</a>
 					</div>

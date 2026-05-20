@@ -43,7 +43,7 @@ const LoginForm = () => {
 				dispatch(setAccessToken(res.data.access_token));
 				dispatch(setRefreshToken(res.data.refresh_token));
 				dispatch(setUser(res.data.user));
-				router.push(ROUTES.HOME);
+				router.push(res.data.user.role === 'admin' ? ROUTES.ADMIN.PRODUCTS.LIST : ROUTES.HOME);
 			},
 		});
 	};

@@ -1,0 +1,26 @@
+{
+	"category": {
+		"actions": "Thao tác",
+		"categories": "Danh mục",
+		"create_category": "Tạo danh mục",
+		"create_error": "Không thể tạo danh mục",
+		"create_success": "Đã tạo danh mục",
+		"delete": "Xóa danh mục",
+		"delete_confirm": "Xóa danh mục này?",
+		"delete_error": "Không thể xóa danh mục",
+		"delete_success": "Đã xóa danh mục",
+		"description": "Mô tả",
+		"description_placeholder": "Mô tả",
+		"edit": "Sửa danh mục",
+		"empty": "Chưa có danh mục.",
+		"id": "ID",
+		"load_error": "Không thể tải danh mục.",
+		"name": "Tên",
+		"name_max": "Tên danh mục tối đa 255 ký tự",
+		"name_placeholder": "Tên danh mục",
+		"name_required": "Tên danh mục là bắt buộc",
+		"no_description": "Không có mô tả",
+		"update_error": "Không thể cập nhật danh mục",
+		"update_success": "Đã cập nhật danh mục"
+	}
+}
