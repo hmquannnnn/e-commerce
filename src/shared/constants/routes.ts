@@ -23,6 +23,9 @@ export const ROUTES = {
 			DETAIL: (id: string) => `/admin/products/${id}`,
 			EDIT: (id: string) => `/admin/products/${id}/edit`,
 		},
+		CATEGORIES: {
+			LIST: '/admin/categories',
+		},
 		ORDERS: {
 			LIST: '/admin/orders',
 			DETAIL: (id: string) => `/admin/orders/${id}`,

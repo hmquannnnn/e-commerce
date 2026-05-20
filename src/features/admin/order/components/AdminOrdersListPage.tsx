@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
+import { Fragment, type FormEvent, type KeyboardEvent, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { AlertCircle, ChevronLeft, ChevronRight, Package, RefreshCw } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronLeft, ChevronRight, Package, RefreshCw, Search, X } from 'lucide-react';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Button } from '@/src/shared/components/base/ui/button';
+import { Input } from '@/src/shared/components/base/ui/input';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
-import { formatPrice } from '@/src/shared/lib/utils';
-import { ADMIN_TRANSITION_STATUSES, isTerminalOrderStatus, type OrderStatus } from '@/src/features/order/interfaces';
-import { getAdminOrderErrorCode, useAdminOrders, useAdminUpdateOrderStatus } from '../api';
+import { cn, formatPrice } from '@/src/shared/lib/utils';
+import {
+	ADMIN_TRANSITION_STATUSES,
+	isTerminalOrderStatus,
+	type IOrderCustomer,
+	type IOrderItem,
+	type OrderStatus,
+} from '@/src/features/order/interfaces';
+import { getAdminOrderErrorCode, useAdminOrder, useAdminOrders, useAdminUpdateOrderStatus } from '../api';
 
 const ALL_STATUSES: OrderStatus[] = ['PENDING', 'PAID', 'DELIVERING', 'DELIVERED', 'CANCELLED'];
 const FILTER_ALL = '__ALL__';
@@ -31,6 +39,29 @@ const statusVariant = (status: OrderStatus): 'default' | 'secondary' | 'destruct
 };
 
 const shortId = (id: string) => id.slice(0, 8);
+
+interface CustomerCellProps {
+	userId: string;
+	customer?: IOrderCustomer;
+}
+
+const CustomerCell = ({ userId, customer }: CustomerCellProps) => {
+	if (!customer) {
+		return (
+			<div className="min-w-44" title={userId}>
+				<p className="font-mono text-xs">{shortId(userId)}</p>
+				<p className="text-muted-foreground text-xs">{userId}</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className="min-w-44" title={`${customer.name} - ${customer.email}`}>
+			<p className="truncate font-medium">{customer.name}</p>
+			<p className="text-muted-foreground truncate text-xs">{customer.email}</p>
+		</div>
+	);
+};
 
 interface InlineStatusUpdaterProps {
 	orderId: string;
@@ -89,17 +120,160 @@ const InlineStatusUpdater = ({ orderId, currentStatus }: InlineStatusUpdaterProp
 	);
 };
 
+interface AdminOrderItemRowProps {
+	item: IOrderItem;
+}
+
+const AdminOrderItemRow = ({ item }: AdminOrderItemRowProps) => (
+	<div className="grid min-w-[720px] grid-cols-[72px_minmax(220px,1fr)_80px_140px_140px] items-center gap-4 border-b px-4 py-3 last:border-b-0">
+		<div className="bg-muted flex h-14 w-14 items-center justify-center overflow-hidden rounded-md">
+			{item.image_url ? (
+				<Image
+					src={item.image_url}
+					alt={item.product_name}
+					width={56}
+					height={56}
+					className="h-full w-full object-cover"
+					unoptimized
+				/>
+			) : (
+				<Package className="text-muted-foreground/40 h-6 w-6" />
+			)}
+		</div>
+		<div className="min-w-0">
+			<p className="truncate font-medium">{item.product_name}</p>
+			<p className="text-muted-foreground truncate font-mono text-xs">{item.product_id}</p>
+		</div>
+		<p className="text-right tabular-nums">{item.quantity}</p>
+		<p className="text-right tabular-nums">{formatPrice(item.unit_price)}</p>
+		<p className="text-primary text-right font-semibold tabular-nums">{formatPrice(item.subtotal)}</p>
+	</div>
+);
+
+interface AdminOrderDetailPanelProps {
+	orderId: string;
+}
+
+const AdminOrderDetailPanel = ({ orderId }: AdminOrderDetailPanelProps) => {
+	const t = useTranslations();
+	const { data: order, isLoading, isError, refetch } = useAdminOrder(orderId, true);
+
+	if (isLoading) {
+		return (
+			<div className="bg-muted/20 border-t px-4 py-4">
+				<div className="space-y-3">
+					<Skeleton className="h-5 w-64" />
+					<Skeleton className="h-20 w-full rounded-lg" />
+					<Skeleton className="h-20 w-full rounded-lg" />
+				</div>
+			</div>
+		);
+	}
+
+	if (isError || !order) {
+		return (
+			<div className="bg-muted/20 flex items-center justify-between gap-3 border-t px-4 py-4">
+				<div className="text-destructive flex items-center gap-2 text-sm">
+					<AlertCircle className="h-4 w-4" />
+					{t('admin.order.detail_load_error')}
+				</div>
+				<Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
+					<RefreshCw className="h-4 w-4" />
+					{t('common.retry')}
+				</Button>
+			</div>
+		);
+	}
+
+	return (
+		<div className="bg-muted/20 border-t px-4 py-4">
+			<div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<p className="font-medium">{t('admin.order.detail_title')}</p>
+					<p className="text-muted-foreground font-mono text-xs">{order.id}</p>
+					{order.customer && (
+						<p className="text-muted-foreground mt-1 text-sm">
+							{order.customer.name} - {order.customer.email}
+						</p>
+					)}
+				</div>
+				<div className="text-right">
+					<p className="text-muted-foreground text-xs">{t('admin.order.total')}</p>
+					<p className="text-primary font-semibold tabular-nums">{formatPrice(order.total_price)}</p>
+				</div>
+			</div>
+
+			<div className="bg-background overflow-x-auto rounded-lg border">
+				<div className="bg-muted/50 text-muted-foreground grid min-w-[720px] grid-cols-[72px_minmax(220px,1fr)_80px_140px_140px] items-center gap-4 border-b px-4 py-2 text-xs font-medium">
+					<span>{t('admin.order.product_image')}</span>
+					<span>{t('admin.order.product')}</span>
+					<span className="text-right">{t('admin.order.quantity')}</span>
+					<span className="text-right">{t('admin.order.unit_price')}</span>
+					<span className="text-right">{t('admin.order.subtotal')}</span>
+				</div>
+				{order.items.length > 0 ? (
+					order.items.map((item) => <AdminOrderItemRow key={`${item.product_id}-${item.product_name}`} item={item} />)
+				) : (
+					<p className="text-muted-foreground px-4 py-6 text-center text-sm">{t('admin.order.empty_items')}</p>
+				)}
+			</div>
+		</div>
+	);
+};
+
 const AdminOrdersListPage = () => {
 	const t = useTranslations();
 	const locale = useLocale();
 	const [page, setPage] = useState(1);
 	const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(undefined);
+	const [searchInput, setSearchInput] = useState('');
+	const [searchTerm, setSearchTerm] = useState('');
+	const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(() => new Set());
 	const limit = 20;
-	const { data, isLoading, isError, refetch } = useAdminOrders(page, limit, statusFilter);
+	const { data, isLoading, isError, refetch } = useAdminOrders(page, limit, statusFilter, searchTerm);
+
+	const clearExpandedOrders = () => {
+		setExpandedOrderIds(new Set());
+	};
+
+	const resetListPosition = () => {
+		setPage(1);
+		clearExpandedOrders();
+	};
 
 	const handleFilterChange = (value: string) => {
-		setPage(1);
+		resetListPosition();
 		setStatusFilter(value === FILTER_ALL ? undefined : (value as OrderStatus));
+	};
+
+	const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		resetListPosition();
+		setSearchTerm(searchInput.trim());
+	};
+
+	const handleClearSearch = () => {
+		resetListPosition();
+		setSearchInput('');
+		setSearchTerm('');
+	};
+
+	const toggleExpanded = (orderId: string) => {
+		setExpandedOrderIds((current) => {
+			const next = new Set(current);
+			if (next.has(orderId)) {
+				next.delete(orderId);
+			} else {
+				next.add(orderId);
+			}
+			return next;
+		});
+	};
+
+	const handleRowKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, orderId: string) => {
+		if (event.key !== 'Enter' && event.key !== ' ') return;
+		event.preventDefault();
+		toggleExpanded(orderId);
 	};
 
 	const renderBody = () => {
@@ -136,7 +310,9 @@ const AdminOrdersListPage = () => {
 					<table className="w-full text-sm">
 						<thead className="bg-muted/50 text-muted-foreground">
 							<tr>
+								<th className="w-10 px-3 py-3" aria-label={t('admin.order.expand')} />
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.id')}</th>
+								<th className="px-4 py-3 text-left font-medium">{t('admin.order.customer')}</th>
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.date')}</th>
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.payment_method')}</th>
 								<th className="px-4 py-3 text-right font-medium">{t('admin.order.total')}</th>
@@ -144,21 +320,62 @@ const AdminOrdersListPage = () => {
 							</tr>
 						</thead>
 						<tbody className="divide-y">
-							{data.items.map((order) => (
-								<tr key={order.id} className="hover:bg-muted/30 transition-colors">
-									<td className="px-4 py-3 font-mono text-xs">#{shortId(order.id)}</td>
-									<td className="text-muted-foreground px-4 py-3">
-										{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
-									</td>
-									<td className="px-4 py-3">{order.payment_method}</td>
-									<td className="text-primary px-4 py-3 text-right font-semibold tabular-nums">
-										{formatPrice(order.total_price)}
-									</td>
-									<td className="px-4 py-3">
-										<InlineStatusUpdater orderId={order.id} currentStatus={order.status} />
-									</td>
-								</tr>
-							))}
+							{data.items.map((order) => {
+								const isExpanded = expandedOrderIds.has(order.id);
+
+								return (
+									<Fragment key={order.id}>
+										<tr
+											tabIndex={0}
+											aria-expanded={isExpanded}
+											className={cn(
+												'hover:bg-muted/30 focus-visible:bg-muted/30 cursor-pointer transition-colors focus-visible:outline-none',
+												isExpanded && 'bg-muted/30'
+											)}
+											onClick={() => toggleExpanded(order.id)}
+											onKeyDown={(event) => handleRowKeyDown(event, order.id)}
+										>
+											<td className="px-3 py-3">
+												<Button
+													type="button"
+													variant="ghost"
+													size="icon-sm"
+													aria-label={isExpanded ? t('admin.order.collapse') : t('admin.order.expand')}
+													onClick={(event) => {
+														event.stopPropagation();
+														toggleExpanded(order.id);
+													}}
+												>
+													{isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+												</Button>
+											</td>
+											<td className="px-4 py-3 font-mono text-xs" title={order.id}>
+												#{shortId(order.id)}
+											</td>
+											<td className="px-4 py-3">
+												<CustomerCell userId={order.user_id} customer={order.customer} />
+											</td>
+											<td className="text-muted-foreground px-4 py-3">
+												{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
+											</td>
+											<td className="px-4 py-3">{order.payment_method}</td>
+											<td className="text-primary px-4 py-3 text-right font-semibold tabular-nums">
+												{formatPrice(order.total_price)}
+											</td>
+											<td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+												<InlineStatusUpdater orderId={order.id} currentStatus={order.status} />
+											</td>
+										</tr>
+										{isExpanded && (
+											<tr>
+												<td colSpan={7} className="p-0">
+													<AdminOrderDetailPanel orderId={order.id} />
+												</td>
+											</tr>
+										)}
+									</Fragment>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>
@@ -169,7 +386,10 @@ const AdminOrdersListPage = () => {
 							variant="outline"
 							size="sm"
 							disabled={page <= 1}
-							onClick={() => setPage((p) => p - 1)}
+							onClick={() => {
+								clearExpandedOrders();
+								setPage((p) => p - 1);
+							}}
 							className="gap-1"
 						>
 							<ChevronLeft className="h-4 w-4" />
@@ -182,7 +402,10 @@ const AdminOrdersListPage = () => {
 							variant="outline"
 							size="sm"
 							disabled={page >= data.total_pages}
-							onClick={() => setPage((p) => p + 1)}
+							onClick={() => {
+								clearExpandedOrders();
+								setPage((p) => p + 1);
+							}}
 							className="gap-1"
 						>
 							{t('order.next_page')}
@@ -202,21 +425,47 @@ const AdminOrdersListPage = () => {
 					<h1 className="text-2xl font-bold">{t('admin.order.orders')}</h1>
 				</div>
 
-				<div className="flex items-center gap-2">
-					<span className="text-muted-foreground text-sm">{t('admin.order.filter_status')}:</span>
-					<Select value={statusFilter ?? FILTER_ALL} onValueChange={handleFilterChange}>
-						<SelectTrigger size="sm" className="min-w-[160px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value={FILTER_ALL}>{t('admin.order.all')}</SelectItem>
-							{ALL_STATUSES.map((s) => (
-								<SelectItem key={s} value={s}>
-									{t(`order.status_${s}`)}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+				<div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-center">
+					<form onSubmit={handleSearchSubmit} className="flex w-full items-center gap-2 sm:w-auto">
+						<Input
+							value={searchInput}
+							onChange={(event) => setSearchInput(event.target.value)}
+							placeholder={t('admin.order.search_placeholder')}
+							className="w-full sm:w-80"
+						/>
+						<Button type="submit" variant="outline" size="sm" className="gap-2">
+							<Search className="h-4 w-4" />
+							{t('admin.order.search')}
+						</Button>
+						{searchTerm !== '' && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon-sm"
+								aria-label={t('admin.order.clear_search')}
+								onClick={handleClearSearch}
+							>
+								<X className="h-4 w-4" />
+							</Button>
+						)}
+					</form>
+
+					<div className="flex items-center gap-2">
+						<span className="text-muted-foreground text-sm">{t('admin.order.filter_status')}:</span>
+						<Select value={statusFilter ?? FILTER_ALL} onValueChange={handleFilterChange}>
+							<SelectTrigger size="sm" className="min-w-[160px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value={FILTER_ALL}>{t('admin.order.all')}</SelectItem>
+								{ALL_STATUSES.map((s) => (
+									<SelectItem key={s} value={s}>
+										{t(`order.status_${s}`)}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 				</div>
 			</div>
 

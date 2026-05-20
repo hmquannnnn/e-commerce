@@ -3,14 +3,46 @@ import { IApiResponse, CustomHookMutationParams } from '@/src/core/api/interface
 import { useQuery, useMutation, DefaultError } from '@tanstack/react-query';
 import {
 	IGenerateProductIdResponse,
+	IAdminProductDetail,
+	IAdminProductListResponse,
 	ICreateProductRequest,
 	ICreateProductResponse,
 	IGetPresignedUrlRequest,
 	IGetPresignedUrlResponse,
+	IInventory,
+	IListAdminProductsQuery,
+	IUpdateProductRequest,
+	IUpdateStockRequest,
 } from '../interfaces';
 import { ADMIN_PRODUCT_QUERY_KEYS } from './query-keys';
 
 const apiClient = initializeApiClientInstance({});
+
+const cleanParams = (params: object) =>
+	Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined && value !== ''));
+
+// ─── Product List / Detail ───────────────────────────────────────────────────
+
+const getProducts = async (params: IListAdminProductsQuery): Promise<IAdminProductListResponse> =>
+	apiClient
+		.get<IApiResponse<IAdminProductListResponse>>('/products', { params: cleanParams(params) })
+		.then((res) => res.data.data);
+
+export const useAdminProducts = (params: IListAdminProductsQuery = {}) =>
+	useQuery({
+		queryKey: ADMIN_PRODUCT_QUERY_KEYS.list(params),
+		queryFn: () => getProducts(params),
+	});
+
+const getProduct = async (id: string): Promise<IAdminProductDetail> =>
+	apiClient.get<IApiResponse<IAdminProductDetail>>(`/products/${id}`).then((res) => res.data.data);
+
+export const useAdminProduct = (id: string) =>
+	useQuery({
+		queryKey: ADMIN_PRODUCT_QUERY_KEYS.detail(id),
+		queryFn: () => getProduct(id),
+		enabled: !!id,
+	});
 
 // ─── Generate Product ID ─────────────────────────────────────────────────────
 
@@ -35,6 +67,68 @@ export const useCreateProduct = (
 ) =>
 	useMutation({
 		mutationFn: createProduct,
+		...(params ?? {}),
+	});
+
+// ─── Update / Delete Product ─────────────────────────────────────────────────
+
+const updateProduct = async ({
+	id,
+	request,
+}: {
+	id: string;
+	request: IUpdateProductRequest;
+}): Promise<IAdminProductDetail> =>
+	apiClient.patch<IApiResponse<IAdminProductDetail>>(`/products/${id}`, request).then((res) => res.data.data);
+
+export const useUpdateProduct = (
+	params: CustomHookMutationParams<
+		IAdminProductDetail,
+		DefaultError,
+		{ id: string; request: IUpdateProductRequest }
+	> = {}
+) =>
+	useMutation({
+		mutationFn: updateProduct,
+		...(params ?? {}),
+	});
+
+const deleteProduct = async (id: string): Promise<void> => {
+	await apiClient.delete(`/products/${id}`);
+};
+
+export const useDeleteProduct = (params: CustomHookMutationParams<void, DefaultError, string> = {}) =>
+	useMutation({
+		mutationFn: deleteProduct,
+		...(params ?? {}),
+	});
+
+// ─── Inventory ───────────────────────────────────────────────────────────────
+
+const getInventory = async (productId: string): Promise<IInventory> =>
+	apiClient.get<IApiResponse<IInventory>>(`/inventory/${productId}`).then((res) => res.data.data);
+
+export const useAdminInventory = (productId: string) =>
+	useQuery({
+		queryKey: ADMIN_PRODUCT_QUERY_KEYS.inventory(productId),
+		queryFn: () => getInventory(productId),
+		enabled: !!productId,
+	});
+
+const updateStock = async ({
+	productId,
+	request,
+}: {
+	productId: string;
+	request: IUpdateStockRequest;
+}): Promise<IInventory> =>
+	apiClient.patch<IApiResponse<IInventory>>(`/inventory/${productId}/stock`, request).then((res) => res.data.data);
+
+export const useUpdateStock = (
+	params: CustomHookMutationParams<IInventory, DefaultError, { productId: string; request: IUpdateStockRequest }> = {}
+) =>
+	useMutation({
+		mutationFn: updateStock,
 		...(params ?? {}),
 	});
 

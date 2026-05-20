@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
@@ -78,6 +78,7 @@ const CheckoutPage = () => {
 	// flash to empty-cart or skeleton caused by the cart being invalidated
 	// after order creation.
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const submitLockedRef = useRef(false);
 
 	const resolvedLines = useMemo(() => {
 		if (!draftLines?.length) return [];
@@ -113,7 +114,7 @@ const CheckoutPage = () => {
 
 	// ── Callbacks ────────────────────────────────────────────────────────────
 
-	const createProviderPayment = (orderId: string, amount: number, _method: PaymentMethod) => {
+	const createProviderPayment = (orderId: string, amount: number) => {
 		const provider: PaymentProvider = 'payos';
 		const providerPaymentMethod: ProviderPaymentMethod = 'qr_code';
 		const origin = window.location.origin;
@@ -132,6 +133,7 @@ const CheckoutPage = () => {
 				onSuccess: (payment) => {
 					if (!payment.checkout_url) {
 						toast.error(t('order.payment_error_generic'));
+						submitLockedRef.current = false;
 						setIsSubmitting(false);
 						router.push(ROUTES.ORDERS.DETAIL(orderId));
 						return;
@@ -141,6 +143,7 @@ const CheckoutPage = () => {
 				},
 				onError: () => {
 					toast.error(t('order.payment_error_generic'));
+					submitLockedRef.current = false;
 					setIsSubmitting(false);
 					router.push(ROUTES.ORDERS.DETAIL(orderId));
 				},
@@ -149,8 +152,10 @@ const CheckoutPage = () => {
 	};
 
 	const handleSubmit = () => {
+		if (submitLockedRef.current) return;
 		if (!draftLines?.length || !resolvedLines?.length) return;
 
+		submitLockedRef.current = true;
 		setIsSubmitting(true);
 
 		const items = resolvedLines.map(({ item, quantity }) => ({
@@ -172,9 +177,10 @@ const CheckoutPage = () => {
 						return;
 					}
 
-					createProviderPayment(order.id, order.total_price, paymentMethod);
+					createProviderPayment(order.id, order.total_price);
 				},
 				onError: (err) => {
+					submitLockedRef.current = false;
 					setIsSubmitting(false);
 					const code = getOrderErrorCode(err);
 					if (code === 'CART_EMPTY') toast.error(t('order.error_cart_empty'));
@@ -239,6 +245,61 @@ const CheckoutPage = () => {
 	const invalid = resolvedLines === null;
 	const showContent = Boolean(!isEmpty && !invalid && resolvedLines && resolvedLines.length > 0);
 
+	const renderCheckoutContent = () => {
+		if (isEmpty || invalid) {
+			return (
+				<div className="flex flex-col items-center gap-4 py-16">
+					<p className="text-muted-foreground">{t('order.checkout_empty')}</p>
+					<Button asChild>
+						<Link href={`/${locale}${ROUTES.CART}`}>{t('cart.title')}</Link>
+					</Button>
+				</div>
+			);
+		}
+
+		if (!showContent) {
+			return <CheckoutSkeleton />;
+		}
+
+		return (
+			<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+				<div className="space-y-4 lg:col-span-2">
+					<p className="text-muted-foreground text-sm">{t('order.checkout_locked_hint')}</p>
+					{resolvedLines.map(({ item, quantity }) => (
+						<CheckoutReadonlyLine key={item.product_id} item={item} quantity={quantity} />
+					))}
+				</div>
+
+				<div className="bg-card h-fit space-y-6 rounded-xl border p-6 lg:col-span-1">
+					<div className="space-y-2 text-sm">
+						<div className="flex justify-between">
+							<span className="text-muted-foreground">{t('order.checkout_selected_total')}</span>
+							<span className="font-semibold">{formatPrice(selectedSubtotal)}</span>
+						</div>
+						<Separator />
+					</div>
+
+					<div className="space-y-2">
+						<label className="text-sm font-medium">{t('order.payment_method')}</label>
+						<Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
+							<SelectTrigger className="w-full">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="CASH">{t('order.payment_cash')}</SelectItem>
+								<SelectItem value="QR_CODE">{t('order.payment_qr_code')}</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
+					<Button className="w-full" size="lg" onClick={handleSubmit} disabled={isSubmitting}>
+						{t('order.place_order')}
+					</Button>
+				</div>
+			</div>
+		);
+	};
+
 	return (
 		<div className="space-y-8">
 			<Link
@@ -254,52 +315,7 @@ const CheckoutPage = () => {
 				<h1 className="text-2xl font-bold">{t('order.checkout_title')}</h1>
 			</div>
 
-			{isEmpty || invalid ? (
-				<div className="flex flex-col items-center gap-4 py-16">
-					<p className="text-muted-foreground">{t('order.checkout_empty')}</p>
-					<Button asChild>
-						<Link href={`/${locale}${ROUTES.CART}`}>{t('cart.title')}</Link>
-					</Button>
-				</div>
-			) : showContent ? (
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-					<div className="space-y-4 lg:col-span-2">
-						<p className="text-muted-foreground text-sm">{t('order.checkout_locked_hint')}</p>
-						{resolvedLines.map(({ item, quantity }) => (
-							<CheckoutReadonlyLine key={item.product_id} item={item} quantity={quantity} />
-						))}
-					</div>
-
-					<div className="bg-card h-fit space-y-6 rounded-xl border p-6 lg:col-span-1">
-						<div className="space-y-2 text-sm">
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">{t('order.checkout_selected_total')}</span>
-								<span className="font-semibold">{formatPrice(selectedSubtotal)}</span>
-							</div>
-							<Separator />
-						</div>
-
-						<div className="space-y-2">
-							<label className="text-sm font-medium">{t('order.payment_method')}</label>
-							<Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
-								<SelectTrigger className="w-full">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="CASH">{t('order.payment_cash')}</SelectItem>
-									<SelectItem value="QR_CODE">{t('order.payment_qr_code')}</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-
-						<Button className="w-full" size="lg" onClick={handleSubmit} disabled={isSubmitting}>
-							{t('order.place_order')}
-						</Button>
-					</div>
-				</div>
-			) : (
-				<CheckoutSkeleton />
-			)}
+			{renderCheckoutContent()}
 		</div>
 	);
 };

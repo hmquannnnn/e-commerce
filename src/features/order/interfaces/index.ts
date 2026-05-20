@@ -25,9 +25,16 @@ export interface IOrderItem {
 	subtotal: number;
 }
 
+export interface IOrderCustomer {
+	id: string;
+	email: string;
+	name: string;
+}
+
 export interface IOrder {
 	id: string;
 	user_id: string;
+	customer?: IOrderCustomer;
 	total_price: number;
 	status: OrderStatus;
 	payment_method: PaymentMethod;
@@ -39,6 +46,7 @@ export interface IOrder {
 export interface IOrderListItem {
 	id: string;
 	user_id: string;
+	customer?: IOrderCustomer;
 	total_price: number;
 	status: OrderStatus;
 	payment_method: PaymentMethod;

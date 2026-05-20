@@ -1,0 +1,26 @@
+{
+	"category": {
+		"actions": "Actions",
+		"categories": "Categories",
+		"create_category": "Create category",
+		"create_error": "Failed to create category",
+		"create_success": "Category created",
+		"delete": "Delete category",
+		"delete_confirm": "Delete this category?",
+		"delete_error": "Failed to delete category",
+		"delete_success": "Category deleted",
+		"description": "Description",
+		"description_placeholder": "Description",
+		"edit": "Edit category",
+		"empty": "No categories found.",
+		"id": "ID",
+		"load_error": "Failed to load categories.",
+		"name": "Name",
+		"name_max": "Category name must be at most 255 characters",
+		"name_placeholder": "Category name",
+		"name_required": "Category name is required",
+		"no_description": "No description",
+		"update_error": "Failed to update category",
+		"update_success": "Category updated"
+	}
+}
