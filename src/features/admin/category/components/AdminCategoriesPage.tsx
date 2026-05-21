@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import axios from 'axios';
 import { AlertCircle, Check, FolderTree, Pencil, Plus, RefreshCw, Trash2, X } from 'lucide-react';
 
 import { Button } from '@/src/shared/components/base/ui/button';
@@ -72,7 +73,17 @@ const CategoryRow = ({ category }: CategoryRowProps) => {
 				toast.success(t('admin.category.delete_success'));
 				invalidateCategories();
 			},
-			onError: () => toast.error(t('admin.category.delete_error')),
+			onError: (error) => {
+				const isHasProducts =
+					axios.isAxiosError(error) &&
+					error.response?.status === 409 &&
+					error.response?.data?.code === 'CATEGORY_HAS_PRODUCTS';
+				toast.error(
+					isHasProducts
+						? t('admin.category.delete_has_products')
+						: t('admin.category.delete_error')
+				);
+			},
 		});
 	};
 

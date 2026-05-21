@@ -1,3 +1,5 @@
+import type { ProductSpecsFormValues, ProductSpecsPayload } from '@/src/features/product/specs/templates';
+
 export interface IGenerateProductIdResponse {
 	product_id: string;
 }
@@ -53,7 +55,7 @@ export interface ICreateProductRequest {
 	name: string;
 	description?: string;
 	price: number;
-	specs?: Record<string, string>;
+	specs?: ProductSpecsPayload;
 	category_id?: number;
 	images: IImageInput[];
 }
@@ -62,7 +64,7 @@ export interface IUpdateProductRequest {
 	name?: string;
 	description?: string;
 	price?: number;
-	specs?: Record<string, string>;
+	specs?: ProductSpecsPayload;
 	category_id?: number;
 }
 
@@ -130,5 +132,5 @@ export interface ICreateProductForm {
 	description: string;
 	price: number | string;
 	category_id: number | string;
-	specs: string; // JSON string edited in textarea
+	specs: ProductSpecsFormValues;
 }

@@ -1,0 +1,121 @@
+{
+	"specs": {
+		"fields": {
+			"accessory": {
+				"compatible_models": "Compatible UAV models",
+				"main_function": "Main function",
+				"type": "Accessory type"
+			},
+			"aircraft": {
+				"dimensions": "Dimensions",
+				"gnss": "Positioning system",
+				"hovering_accuracy": "Hovering accuracy",
+				"max_flight_time": "Max flight time",
+				"max_speed": "Max speed",
+				"max_takeoff_altitude": "Max takeoff altitude",
+				"max_takeoff_weight": "Max takeoff weight",
+				"max_transmission_distance": "Max transmission distance",
+				"max_wind_resistance": "Max wind resistance",
+				"operating_temperature": "Operating temperature",
+				"rtk_gnss": "RTK/GNSS",
+				"weight": "Weight"
+			},
+			"battery": {
+				"battery_type": "Battery type",
+				"capacity": "Battery capacity",
+				"charging_time": "Charging time",
+				"model": "Battery model",
+				"voltage": "Battery voltage",
+				"weight": "Battery weight"
+			},
+			"camera": {
+				"aperture": "Aperture",
+				"digital_zoom": "Digital zoom",
+				"lens": "Lens",
+				"max_photo_resolution": "Max photo resolution",
+				"max_video_resolution": "Max video resolution",
+				"photo_format": "Photo format",
+				"sensor": "Camera sensor",
+				"video_format": "Video format"
+			},
+			"gimbal": {
+				"controllable_range": "Controllable range",
+				"mechanical_range": "Mechanical range",
+				"stabilization": "Stabilization"
+			},
+			"package": {
+				"included_items": "Included items",
+				"quantity": "Quantity"
+			},
+			"physical": {
+				"dimensions": "Dimensions",
+				"material": "Material",
+				"weight": "Weight"
+			},
+			"power": {
+				"capacity": "Capacity",
+				"charging_time": "Charging time",
+				"power": "Power",
+				"voltage": "Voltage"
+			},
+			"remote_controller": {
+				"model": "Controller model",
+				"screen": "Screen",
+				"transmission_distance": "Transmission distance"
+			},
+			"sensing": {
+				"backward": "Backward sensing",
+				"downward": "Downward sensing",
+				"forward": "Forward sensing",
+				"obstacle_detection_range": "Obstacle detection range",
+				"operating_environment": "Operating environment",
+				"system": "Sensing system",
+				"terrain_following": "Terrain following"
+			},
+			"spraying": {
+				"droplet_size": "Droplet size",
+				"max_flow_rate": "Max flow rate",
+				"nozzle_count": "Nozzle count",
+				"pump_type": "Pump type",
+				"spray_width": "Spray width",
+				"tank_capacity": "Spray tank capacity"
+			},
+			"spreading": {
+				"material_diameter": "Material diameter",
+				"payload": "Spreading payload",
+				"spreading_width": "Spreading width",
+				"tank_capacity": "Spreading tank capacity"
+			},
+			"storage": {
+				"internal_storage": "Internal storage",
+				"supported_sd_cards": "Supported SD cards"
+			},
+			"transmission": {
+				"frequency": "Frequency",
+				"live_view_quality": "Live view quality",
+				"system": "Transmission system"
+			}
+		},
+		"groups": {
+			"accessory": "Accessory",
+			"aircraft": "Aircraft",
+			"battery": "Battery",
+			"camera": "Camera",
+			"gimbal": "Gimbal",
+			"package": "Package",
+			"physical": "Physical",
+			"power": "Power",
+			"remote_controller": "Remote controller",
+			"sensing": "Sensing",
+			"spraying": "Spraying system",
+			"spreading": "Spreading system",
+			"storage": "Storage",
+			"transmission": "Video transmission"
+		},
+		"templates": {
+			"agriculture_uav_v1": "Agriculture UAV specs",
+			"camera_drone_v1": "Camera drone specs",
+			"uav_accessory_v1": "UAV accessory specs"
+		}
+	}
+}

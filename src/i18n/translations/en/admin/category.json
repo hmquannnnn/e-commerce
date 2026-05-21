@@ -8,6 +8,7 @@
 		"delete": "Delete category",
 		"delete_confirm": "Delete this category?",
 		"delete_error": "Failed to delete category",
+		"delete_has_products": "Cannot delete: this category still has products. Move or delete them first.",
 		"delete_success": "Category deleted",
 		"description": "Description",
 		"description_placeholder": "Description",
