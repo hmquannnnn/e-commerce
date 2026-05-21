@@ -4,7 +4,18 @@ import Image from 'next/image';
 import { Fragment, type FormEvent, type KeyboardEvent, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { AlertCircle, ChevronDown, ChevronLeft, ChevronRight, Package, RefreshCw, Search, X } from 'lucide-react';
+import {
+	AlertCircle,
+	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
+	MapPin,
+	Package,
+	Phone,
+	RefreshCw,
+	Search,
+	X,
+} from 'lucide-react';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Input } from '@/src/shared/components/base/ui/input';
@@ -62,6 +73,24 @@ const CustomerCell = ({ userId, customer }: CustomerCellProps) => {
 		</div>
 	);
 };
+
+interface ShippingCellProps {
+	phone: string;
+	address: string;
+}
+
+const ShippingCell = ({ phone, address }: ShippingCellProps) => (
+	<div className="min-w-52 max-w-72 space-y-1 text-xs">
+		<p className="flex items-center gap-1.5">
+			<Phone className="text-muted-foreground h-3.5 w-3.5" />
+			<span className="font-medium">{phone}</span>
+		</p>
+		<p className="text-muted-foreground flex items-start gap-1.5">
+			<MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+			<span className="line-clamp-2">{address}</span>
+		</p>
+	</div>
+);
 
 interface InlineStatusUpdaterProps {
 	orderId: string;
@@ -196,6 +225,9 @@ const AdminOrderDetailPanel = ({ orderId }: AdminOrderDetailPanelProps) => {
 							{order.customer.name} - {order.customer.email}
 						</p>
 					)}
+					<div className="mt-3">
+						<ShippingCell phone={order.shipping_phone} address={order.shipping_address} />
+					</div>
 				</div>
 				<div className="text-right">
 					<p className="text-muted-foreground text-xs">{t('admin.order.total')}</p>
@@ -313,6 +345,7 @@ const AdminOrdersListPage = () => {
 								<th className="w-10 px-3 py-3" aria-label={t('admin.order.expand')} />
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.id')}</th>
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.customer')}</th>
+								<th className="px-4 py-3 text-left font-medium">{t('admin.order.shipping')}</th>
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.date')}</th>
 								<th className="px-4 py-3 text-left font-medium">{t('admin.order.payment_method')}</th>
 								<th className="px-4 py-3 text-right font-medium">{t('admin.order.total')}</th>
@@ -355,6 +388,9 @@ const AdminOrdersListPage = () => {
 											<td className="px-4 py-3">
 												<CustomerCell userId={order.user_id} customer={order.customer} />
 											</td>
+											<td className="px-4 py-3">
+												<ShippingCell phone={order.shipping_phone} address={order.shipping_address} />
+											</td>
 											<td className="text-muted-foreground px-4 py-3">
 												{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
 											</td>
@@ -368,7 +404,7 @@ const AdminOrdersListPage = () => {
 										</tr>
 										{isExpanded && (
 											<tr>
-												<td colSpan={7} className="p-0">
+												<td colSpan={8} className="p-0">
 													<AdminOrderDetailPanel orderId={order.id} />
 												</td>
 											</tr>

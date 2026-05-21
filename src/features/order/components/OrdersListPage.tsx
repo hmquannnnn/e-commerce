@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import { AlertCircle, ChevronLeft, ChevronRight, Package, RefreshCw } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, MapPin, Package, Phone, RefreshCw } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
@@ -97,6 +97,16 @@ const OrdersListPage = () => {
 										<p className="text-muted-foreground text-xs">
 											{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
 										</p>
+										<div className="text-muted-foreground mt-2 space-y-1 text-xs">
+											<p className="flex items-center gap-1.5">
+												<Phone className="h-3.5 w-3.5" />
+												<span>{order.shipping_phone}</span>
+											</p>
+											<p className="flex items-start gap-1.5">
+												<MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+												<span className="line-clamp-2">{order.shipping_address}</span>
+											</p>
+										</div>
 									</div>
 									<div className="flex flex-wrap items-center gap-3">
 										<Badge variant={statusVariant(order.status)}>{t(`order.status_${order.status}`)}</Badge>

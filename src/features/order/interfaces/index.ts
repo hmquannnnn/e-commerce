@@ -38,6 +38,8 @@ export interface IOrder {
 	total_price: number;
 	status: OrderStatus;
 	payment_method: PaymentMethod;
+	shipping_phone: string;
+	shipping_address: string;
 	items: IOrderItem[];
 	created_at: string;
 	updated_at: string;
@@ -50,6 +52,8 @@ export interface IOrderListItem {
 	total_price: number;
 	status: OrderStatus;
 	payment_method: PaymentMethod;
+	shipping_phone: string;
+	shipping_address: string;
 	created_at: string;
 	updated_at: string;
 }
@@ -61,6 +65,8 @@ export interface ICreateOrderItem {
 
 export interface ICreateOrderRequest {
 	payment_method: PaymentMethod;
+	shipping_phone: string;
+	shipping_address: string;
 	items: ICreateOrderItem[];
 }
 

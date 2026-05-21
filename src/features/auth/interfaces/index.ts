@@ -40,6 +40,6 @@ export interface IRefreshTokenResponse {
 	access_token: string;
 }
 
-export interface ILogoutRequest { }
+export interface ILogoutRequest {}
 
-export interface ILogoutResponse { }
+export interface ILogoutResponse {}
