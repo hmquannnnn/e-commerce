@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/components/base/ui/card';
 import { Input } from '@/src/shared/components/base/ui/input';
+import { Textarea } from '@/src/shared/components/base/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
 import { cn } from '@/src/shared/lib/utils';
 import { ICategory } from '@/src/features/product/interfaces';
@@ -105,7 +106,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 									<Input {...field} placeholder={t('admin.product.name_placeholder')} aria-invalid={!!errors.name} />
 								)}
 							/>
-							{errors.name && <p className="text-destructive mt-1.5 text-sm">{errors.name.message}</p>}
+							{errors.name && <p className="mt-1.5 text-sm text-destructive">{errors.name.message}</p>}
 						</div>
 
 						<div>
@@ -114,12 +115,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 								name="description"
 								control={control}
 								render={({ field }) => (
-									<textarea
-										{...field}
-										rows={5}
-										placeholder={t('admin.product.description_placeholder')}
-										className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-									/>
+									<Textarea {...field} rows={5} placeholder={t('admin.product.description_placeholder')} />
 								)}
 							/>
 						</div>
@@ -127,24 +123,21 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 						<div>
 							<label className="mb-1.5 block text-sm font-medium">
 								{t('admin.product.specs')}
-								<span className="text-muted-foreground ml-1 text-xs">(JSON)</span>
+								<span className="ml-1 text-xs text-muted-foreground">(JSON)</span>
 							</label>
 							<Controller
 								name="specs"
 								control={control}
 								render={({ field }) => (
-									<textarea
+									<Textarea
 										{...field}
 										rows={7}
 										placeholder='{"weight": "1.2kg", "battery": "5000mAh"}'
-										className={cn(
-											'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[140px] w-full rounded-md border px-3 py-2 font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-											errors.specs && 'border-destructive'
-										)}
+										className={cn('min-h-[160px] font-mono text-[14px]', errors.specs && 'border-destructive')}
 									/>
 								)}
 							/>
-							{errors.specs && <p className="text-destructive mt-1.5 text-sm">{errors.specs.message}</p>}
+							{errors.specs && <p className="mt-1.5 text-sm text-destructive">{errors.specs.message}</p>}
 						</div>
 					</CardContent>
 				</Card>
@@ -165,7 +158,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 								control={control}
 								render={({ field }) => (
 									<div className="relative">
-										<span className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 text-sm">₫</span>
+										<span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">₫</span>
 										<Input
 											{...field}
 											type="number"
@@ -178,7 +171,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 									</div>
 								)}
 							/>
-							{errors.price && <p className="text-destructive mt-1.5 text-sm">{errors.price.message}</p>}
+							{errors.price && <p className="mt-1.5 text-sm text-destructive">{errors.price.message}</p>}
 						</div>
 
 						<div>

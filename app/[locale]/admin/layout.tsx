@@ -1,20 +1,42 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAppSelector } from '@/src/core/store/store';
+import Link from 'next/link';
+import { useAppDispatch, useAppSelector } from '@/src/core/store/store';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { ROUTES } from '@/src/shared/constants/routes';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut, ShoppingBag, User } from 'lucide-react';
 import { Toaster } from '@/src/shared/components/base/ui/sonner';
 import { cn } from '@/src/shared/lib/utils';
+import { clearAuth } from '@/src/core/store/auth.slice';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/src/shared/components/base/ui/dropdown-menu';
 
+/**
+ * Admin chassis — pure-black 44px global-nav + parchment frosted sub-nav.
+ * Mirrors the storefront chrome but swaps the sub-nav links for admin
+ * sections (products / categories / orders). The page body sits on the
+ * canvas surface with consistent 5xl max-width.
+ */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 	const user = useAppSelector((s) => s.auth.user);
+	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const pathname = usePathname();
 	const locale = useLocale();
 	const t = useTranslations();
+
+	const handleLogout = () => {
+		dispatch(clearAuth());
+		router.replace(`/${locale}${ROUTES.AUTH.LOGIN}`);
+	};
 
 	useEffect(() => {
 		if (user !== undefined && user !== null && user.role !== 'admin') {
@@ -25,11 +47,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 		}
 	}, [user, router, locale]);
 
-	// Show nothing while auth state resolves
 	if (user === undefined) {
 		return (
-			<div className="flex min-h-screen items-center justify-center">
-				<Loader2 className="h-6 w-6 animate-spin" />
+			<div className="flex min-h-screen items-center justify-center bg-canvas-parchment">
+				<Loader2 className="h-6 w-6 animate-spin text-primary" />
 			</div>
 		);
 	}
@@ -41,34 +62,73 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 		return pathname === localizedPath || pathname.startsWith(`${localizedPath}/`);
 	};
 
-	const navLinkClass = (path: string) =>
-		cn(
-			'text-muted-foreground hover:text-foreground text-sm transition-colors',
-			isActive(path) && 'text-foreground font-semibold'
-		);
+	const adminLinks = [
+		{ href: ROUTES.ADMIN.PRODUCTS.LIST, label: t('admin.product.products') },
+		{ href: ROUTES.ADMIN.CATEGORIES.LIST, label: t('admin.category.categories') },
+		{ href: ROUTES.ADMIN.ORDERS.LIST, label: t('admin.order.orders') },
+	];
 
 	return (
-		<>
-			<div className="min-h-screen">
-				<nav className="border-b px-6 py-3">
-					<div className="mx-auto flex max-w-7xl items-center gap-6">
-						<a href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`} className={navLinkClass(ROUTES.ADMIN.PRODUCTS.LIST)}>
-							{t('admin.product.products')}
-						</a>
-						<a
-							href={`/${locale}${ROUTES.ADMIN.CATEGORIES.LIST}`}
-							className={navLinkClass(ROUTES.ADMIN.CATEGORIES.LIST)}
-						>
-							{t('admin.category.categories')}
-						</a>
-						<a href={`/${locale}${ROUTES.ADMIN.ORDERS.LIST}`} className={navLinkClass(ROUTES.ADMIN.ORDERS.LIST)}>
-							{t('admin.order.orders')}
-						</a>
+		<div className="flex min-h-screen flex-col bg-canvas">
+			{/* ── Tier 1: global-nav ──────────────────────────────────────────── */}
+			<nav className="sticky top-0 z-50 w-full bg-surface-black">
+				<div className="mx-auto flex h-11 max-w-[1280px] items-center justify-between px-5">
+					{/* Brand — links to admin products list (stays within admin) */}
+					<Link
+						href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`}
+						className="inline-flex items-center gap-1.5 text-[14px] font-medium tracking-tight text-body-on-dark"
+					>
+						<ShoppingBag className="h-4 w-4" />
+						UAV Store · {t('common.admin')}
+					</Link>
+
+					{/* User dropdown with logout */}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button className="text-nav-link press inline-flex items-center gap-1.5 text-body-muted-on-dark outline-none hover:text-white">
+								<User className="h-3.5 w-3.5" />
+								<span>{user.name ?? user.email}</span>
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="min-w-[180px]">
+							<DropdownMenuLabel className="text-ink-muted-48">{user.email}</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={handleLogout}
+								className="cursor-pointer text-destructive focus:text-destructive"
+							>
+								<LogOut className="h-4 w-4" />
+								{t('common.logout')}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			</nav>
+
+			{/* ── Tier 2: sub-nav-frosted ─────────────────────────────────────── */}
+			<div className="frost sticky top-11 z-40 w-full border-b border-hairline/60">
+				<div className="mx-auto flex h-[52px] max-w-[1280px] items-center justify-between px-5">
+					<p className="text-tagline text-ink">{t('common.admin')}</p>
+					<div className="flex items-center gap-1">
+						{adminLinks.map((link) => (
+							<Link
+								key={link.href}
+								href={`/${locale}${link.href}`}
+								className={cn(
+									'press inline-flex h-9 items-center rounded-full px-3.5 text-[14px] tracking-[-0.014em]',
+									isActive(link.href) ? 'bg-ink text-white' : 'text-ink-muted-80 hover:text-ink'
+								)}
+							>
+								{link.label}
+							</Link>
+						))}
 					</div>
-				</nav>
-				<main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+				</div>
 			</div>
+
+			<main className="mx-auto w-full max-w-[1280px] flex-1 px-5 py-12">{children}</main>
+
 			<Toaster richColors />
-		</>
+		</div>
 	);
 }

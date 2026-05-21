@@ -10,6 +10,7 @@ import Image from 'next/image';
 
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Input } from '@/src/shared/components/base/ui/input';
+import { Textarea } from '@/src/shared/components/base/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/components/base/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
 import { cn } from '@/src/shared/lib/utils';
@@ -170,7 +171,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 									<Input {...field} placeholder={t('admin.product.name_placeholder')} aria-invalid={!!errors.name} />
 								)}
 							/>
-							{errors.name && <p className="text-destructive mt-1.5 text-sm">{errors.name.message}</p>}
+							{errors.name && <p className="mt-1.5 text-sm text-destructive">{errors.name.message}</p>}
 						</div>
 
 						{/* Description */}
@@ -180,12 +181,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 								name="description"
 								control={control}
 								render={({ field }) => (
-									<textarea
-										{...field}
-										rows={4}
-										placeholder={t('admin.product.description_placeholder')}
-										className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-									/>
+									<Textarea {...field} rows={4} placeholder={t('admin.product.description_placeholder')} />
 								)}
 							/>
 						</div>
@@ -194,24 +190,21 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 						<div>
 							<label className="mb-1.5 block text-sm font-medium">
 								{t('admin.product.specs')}
-								<span className="text-muted-foreground ml-1 text-xs">(JSON)</span>
+								<span className="ml-1 text-xs text-muted-foreground">(JSON)</span>
 							</label>
 							<Controller
 								name="specs"
 								control={control}
 								render={({ field }) => (
-									<textarea
+									<Textarea
 										{...field}
 										rows={4}
 										placeholder='{"weight": "1.2kg", "battery": "5000mAh"}'
-										className={cn(
-											'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-											errors.specs && 'border-destructive'
-										)}
+										className={cn('font-mono text-[14px]', errors.specs && 'border-destructive')}
 									/>
 								)}
 							/>
-							{errors.specs && <p className="text-destructive mt-1.5 text-sm">{errors.specs.message}</p>}
+							{errors.specs && <p className="mt-1.5 text-sm text-destructive">{errors.specs.message}</p>}
 						</div>
 					</CardContent>
 				</Card>
@@ -223,12 +216,12 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 					</CardHeader>
 					<CardContent className="space-y-4">
 						{isIdLoading && (
-							<div className="text-muted-foreground flex items-center gap-2 text-sm">
+							<div className="flex items-center gap-2 text-sm text-muted-foreground">
 								<Loader2 className="h-4 w-4 animate-spin" />
 								{t('admin.product.preparing_upload')}
 							</div>
 						)}
-						{isIdError && <p className="text-destructive text-sm">{t('admin.product.product_id_error')}</p>}
+						{isIdError && <p className="text-sm text-destructive">{t('admin.product.product_id_error')}</p>}
 
 						{/* Drop zone */}
 						{productId && (
@@ -236,11 +229,11 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 								onDrop={handleDrop}
 								onDragOver={(e) => e.preventDefault()}
 								onClick={() => fileInputRef.current?.click()}
-								className="border-input hover:bg-muted/30 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 transition-colors"
+								className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input px-4 py-8 transition-colors hover:bg-muted/30"
 							>
-								<ImagePlus className="text-muted-foreground h-8 w-8" />
-								<p className="text-muted-foreground text-sm font-medium">{t('admin.product.drop_or_click')}</p>
-								<p className="text-muted-foreground text-xs">{t('admin.product.accepted_formats')}</p>
+								<ImagePlus className="h-8 w-8 text-muted-foreground" />
+								<p className="text-sm font-medium text-muted-foreground">{t('admin.product.drop_or_click')}</p>
+								<p className="text-xs text-muted-foreground">{t('admin.product.accepted_formats')}</p>
 								<input
 									ref={fileInputRef}
 									type="file"
@@ -275,14 +268,14 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 
 										{/* Primary badge */}
 										{img.is_primary && !img.uploading && (
-											<span className="absolute left-1 top-1 rounded bg-yellow-400 px-1.5 py-0.5 text-xs font-semibold text-yellow-900">
+											<span className="absolute top-1 left-1 rounded bg-yellow-400 px-1.5 py-0.5 text-xs font-semibold text-yellow-900">
 												{t('admin.product.primary')}
 											</span>
 										)}
 
 										{/* Actions (visible on hover) */}
 										{!img.uploading && (
-											<div className="absolute right-1 top-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+											<div className="absolute top-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 												<button
 													type="button"
 													onClick={() => setPrimary(idx)}
@@ -330,7 +323,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 								control={control}
 								render={({ field }) => (
 									<div className="relative">
-										<span className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 text-sm">₫</span>
+										<span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">₫</span>
 										<Input
 											{...field}
 											type="number"
@@ -343,7 +336,7 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 									</div>
 								)}
 							/>
-							{errors.price && <p className="text-destructive mt-1.5 text-sm">{errors.price.message}</p>}
+							{errors.price && <p className="mt-1.5 text-sm text-destructive">{errors.price.message}</p>}
 						</div>
 
 						{/* Category */}
@@ -375,10 +368,10 @@ const CreateProductForm = ({ categories }: CreateProductFormProps) => {
 				{productId && (
 					<Card>
 						<CardContent className="pt-4">
-							<p className="text-muted-foreground text-xs">
+							<p className="text-xs text-muted-foreground">
 								<span className="font-medium">{t('admin.product.product_id')}:</span>
 								<br />
-								<code className="break-all text-xs">{productId}</code>
+								<code className="text-xs break-all">{productId}</code>
 							</p>
 						</CardContent>
 					</Card>

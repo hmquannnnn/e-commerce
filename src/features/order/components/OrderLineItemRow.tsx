@@ -10,28 +10,28 @@ interface OrderLineItemRowProps {
 }
 
 const OrderLineItemRow = ({ item }: OrderLineItemRowProps) => (
-	<div className="bg-card flex items-center gap-4 rounded-xl border p-4">
-		<div className="bg-muted flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg">
+	<div className="flex items-center gap-4 rounded-[18px] border border-hairline bg-canvas p-5">
+		<div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-canvas-parchment">
 			{item.image_url ? (
 				<Image
 					src={item.image_url}
 					alt={item.product_name}
 					width={80}
 					height={80}
-					className="h-full w-full object-cover"
+					className="shadow-product h-full w-full object-contain"
 					unoptimized
 				/>
 			) : (
-				<Package className="text-muted-foreground/40 h-8 w-8" />
+				<Package className="h-8 w-8 text-ink-muted-48/40" />
 			)}
 		</div>
 		<div className="min-w-0 flex-1">
-			<p className="truncate font-medium">{item.product_name}</p>
-			<p className="text-muted-foreground text-sm">
+			<p className="text-body-strong truncate text-ink">{item.product_name}</p>
+			<p className="text-caption text-ink-muted-48 tabular-nums">
 				{formatPrice(item.unit_price)} × {item.quantity}
 			</p>
 		</div>
-		<p className="text-primary font-semibold tabular-nums">{formatPrice(item.subtotal)}</p>
+		<p className="text-body-strong text-ink tabular-nums">{formatPrice(item.subtotal)}</p>
 	</div>
 );
 

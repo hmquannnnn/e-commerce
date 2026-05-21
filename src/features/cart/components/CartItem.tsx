@@ -18,7 +18,6 @@ export interface ICartItemSelection {
 
 interface CartItemProps {
 	item: ICartItem;
-	/** Khi có: hiển thị checkbox + số lượng đặt trong đơn (≤ số trong giỏ). */
 	selection?: ICartItemSelection;
 }
 
@@ -47,73 +46,71 @@ const CartItem = ({ item, selection }: CartItemProps) => {
 	const sel = selection;
 
 	return (
-		<div className="bg-card flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center">
-			<div className="flex min-w-0 flex-1 items-start gap-3">
+		<div className="flex flex-col gap-4 rounded-[18px] border border-hairline bg-canvas p-5 sm:flex-row sm:items-center">
+			<div className="flex min-w-0 flex-1 items-start gap-4">
 				{sel && (
 					<Checkbox
 						checked={sel.selected}
 						onCheckedChange={(checked) => sel.onSelectChange(checked === true)}
-						className="mt-1"
+						className="mt-1.5"
 					/>
 				)}
-				<div className="bg-muted flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg">
+				<div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-canvas-parchment">
 					{item.image_url ? (
 						<Image
 							src={item.image_url}
 							alt={item.product_name}
-							width={80}
-							height={80}
-							className="h-full w-full object-cover"
+							width={96}
+							height={96}
+							className="shadow-product h-full w-full object-contain"
 							unoptimized
 							loading="eager"
 						/>
 					) : (
-						<Package className="text-muted-foreground/40 h-8 w-8" />
+						<Package className="h-9 w-9 text-ink-muted-48/40" />
 					)}
 				</div>
-				<div className="min-w-0 flex-1">
-					<p className="truncate font-medium">{item.product_name}</p>
-					<p className="text-muted-foreground text-sm">{formatPrice(item.unit_price)}</p>
-					<div className="mt-2 flex flex-wrap items-center gap-2">
-						<span className="text-muted-foreground text-xs">{t('cart.in_cart_qty')}:</span>
-						<div className="flex items-center gap-2">
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
+				<div className="min-w-0 flex-1 space-y-2">
+					<p className="text-body-strong truncate text-ink">{item.product_name}</p>
+					<p className="text-caption text-ink-muted-48 tabular-nums">{formatPrice(item.unit_price)}</p>
+					<div className="flex items-center gap-3">
+						<span className="text-caption text-ink-muted-48">{t('cart.in_cart_qty')}</span>
+						<div className="flex items-center gap-2 rounded-full border border-hairline bg-canvas px-1.5 py-0.5">
+							<button
+								type="button"
 								onClick={handleDecrement}
 								disabled={isPending}
 								aria-label={t('cart.decrease_qty')}
+								className="press inline-flex h-7 w-7 items-center justify-center rounded-full text-ink-muted-80 hover:text-ink disabled:opacity-40"
 							>
 								<Minus className="h-3 w-3" />
-							</Button>
-							<span className="w-8 text-center text-sm font-medium tabular-nums">{item.quantity}</span>
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
+							</button>
+							<span className="text-caption-strong w-7 text-center text-ink tabular-nums">{item.quantity}</span>
+							<button
+								type="button"
 								onClick={handleIncrement}
 								disabled={isPending}
 								aria-label={t('cart.increase_qty')}
+								className="press inline-flex h-7 w-7 items-center justify-center rounded-full text-ink-muted-80 hover:text-ink disabled:opacity-40"
 							>
 								<Plus className="h-3 w-3" />
-							</Button>
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
-				<p className="text-primary text-right font-semibold sm:min-w-[100px]">
+				<p className="text-body-strong text-ink tabular-nums sm:min-w-[120px] sm:text-right">
 					{sel && sel.selected ? formatPrice(item.unit_price * sel.orderQty) : formatPrice(item.subtotal)}
 				</p>
 				<Button
 					variant="ghost"
-					size="icon"
-					className="text-muted-foreground hover:text-destructive h-8 w-8 flex-shrink-0"
+					size="icon-sm"
 					onClick={handleRemove}
 					disabled={isPending}
 					aria-label={t('cart.remove')}
+					className="text-ink-muted-48 hover:text-destructive"
 				>
 					<Trash2 className="h-4 w-4" />
 				</Button>

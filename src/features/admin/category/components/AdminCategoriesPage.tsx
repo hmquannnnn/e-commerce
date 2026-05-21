@@ -78,19 +78,25 @@ const CategoryRow = ({ category }: CategoryRowProps) => {
 
 	if (isEditing) {
 		return (
-			<tr className="hover:bg-muted/30 transition-colors">
-				<td className="px-4 py-3 align-top">
-					<Input value={name} onChange={(e) => setName(e.target.value)} aria-label={t('admin.category.name')} />
+			<tr className="transition-colors hover:bg-canvas-parchment/40">
+				<td className="px-5 py-3 align-top">
+					<Input
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						aria-label={t('admin.category.name')}
+						className="h-9 px-4 text-[14px]"
+					/>
 				</td>
-				<td className="px-4 py-3 align-top">
+				<td className="px-5 py-3 align-top">
 					<Input
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						aria-label={t('admin.category.description')}
+						className="h-9 px-4 text-[14px]"
 					/>
 				</td>
-				<td className="text-muted-foreground px-4 py-3 align-top text-sm tabular-nums">{category.id}</td>
-				<td className="px-4 py-3 align-top">
+				<td className="text-caption px-5 py-3 align-top text-ink-muted-48 tabular-nums">{category.id}</td>
+				<td className="px-5 py-3 align-top">
 					<div className="flex justify-end gap-2">
 						<Button
 							size="icon-sm"
@@ -110,15 +116,17 @@ const CategoryRow = ({ category }: CategoryRowProps) => {
 	}
 
 	return (
-		<tr className="hover:bg-muted/30 transition-colors">
-			<td className="px-4 py-3 font-medium">{category.name}</td>
-			<td className="text-muted-foreground px-4 py-3">{category.description || t('admin.category.no_description')}</td>
-			<td className="text-muted-foreground px-4 py-3 text-sm tabular-nums">{category.id}</td>
-			<td className="px-4 py-3">
+		<tr className="transition-colors hover:bg-canvas-parchment/40">
+			<td className="text-body-strong px-5 py-4 text-ink">{category.name}</td>
+			<td className="text-caption px-5 py-4 text-ink-muted-80">
+				{category.description || t('admin.category.no_description')}
+			</td>
+			<td className="text-caption px-5 py-4 text-ink-muted-48 tabular-nums">{category.id}</td>
+			<td className="px-5 py-4">
 				<div className="flex justify-end gap-2">
 					<Button
 						size="icon-sm"
-						variant="outline"
+						variant="secondary"
 						onClick={() => setIsEditing(true)}
 						aria-label={t('admin.category.edit')}
 					>
@@ -126,10 +134,11 @@ const CategoryRow = ({ category }: CategoryRowProps) => {
 					</Button>
 					<Button
 						size="icon-sm"
-						variant="destructive"
+						variant="ghost"
 						onClick={handleDelete}
 						disabled={deleteCategory.isPending}
 						aria-label={t('admin.category.delete')}
+						className="text-ink-muted-48 hover:text-destructive"
 					>
 						<Trash2 className="h-4 w-4" />
 					</Button>
@@ -181,7 +190,7 @@ const AdminCategoriesPage = () => {
 			return (
 				<div className="space-y-3">
 					{[1, 2, 3].map((i) => (
-						<Skeleton key={i} className="h-14 w-full rounded-xl" />
+						<Skeleton key={i} className="h-14 w-full rounded-[14px]" />
 					))}
 				</div>
 			);
@@ -190,8 +199,8 @@ const AdminCategoriesPage = () => {
 		if (isError || !data) {
 			return (
 				<div className="flex flex-col items-center justify-center gap-4 py-16">
-					<AlertCircle className="text-destructive h-12 w-12" />
-					<p className="text-muted-foreground">{t('admin.category.load_error')}</p>
+					<AlertCircle className="h-12 w-12 text-destructive" />
+					<p className="text-lead text-ink-muted-80">{t('admin.category.load_error')}</p>
 					<Button variant="outline" onClick={() => refetch()} className="gap-2">
 						<RefreshCw className="h-4 w-4" />
 						{t('common.retry')}
@@ -201,21 +210,26 @@ const AdminCategoriesPage = () => {
 		}
 
 		if (data.length === 0) {
-			return <p className="text-muted-foreground py-12 text-center">{t('admin.category.empty')}</p>;
+			return (
+				<div className="flex flex-col items-center justify-center gap-3 rounded-[18px] bg-canvas-parchment py-20">
+					<FolderTree className="h-12 w-12 text-ink-muted-48/40" />
+					<p className="text-lead text-ink-muted-80">{t('admin.category.empty')}</p>
+				</div>
+			);
 		}
 
 		return (
-			<div className="overflow-x-auto rounded-xl border">
+			<div className="overflow-x-auto rounded-[18px] border border-hairline">
 				<table className="w-full text-sm">
-					<thead className="bg-muted/50 text-muted-foreground">
+					<thead className="text-caption-strong bg-canvas-parchment text-ink-muted-80">
 						<tr>
-							<th className="px-4 py-3 text-left font-medium">{t('admin.category.name')}</th>
-							<th className="px-4 py-3 text-left font-medium">{t('admin.category.description')}</th>
-							<th className="px-4 py-3 text-left font-medium">{t('admin.category.id')}</th>
-							<th className="px-4 py-3 text-right font-medium">{t('admin.category.actions')}</th>
+							<th className="px-5 py-3 text-left">{t('admin.category.name')}</th>
+							<th className="px-5 py-3 text-left">{t('admin.category.description')}</th>
+							<th className="px-5 py-3 text-left">{t('admin.category.id')}</th>
+							<th className="px-5 py-3 text-right">{t('admin.category.actions')}</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y">
+					<tbody className="divide-y divide-hairline">
 						{data.map((category) => (
 							<CategoryRow key={category.id} category={category} />
 						))}
@@ -226,13 +240,17 @@ const AdminCategoriesPage = () => {
 	};
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center gap-3">
-				<FolderTree className="h-6 w-6" />
-				<h1 className="text-2xl font-bold">{t('admin.category.categories')}</h1>
+		<div className="space-y-8">
+			<div className="space-y-2">
+				<p className="text-tagline inline-flex items-center gap-2 text-primary">
+					<FolderTree className="h-4 w-4" />
+					{t('admin.category.categories')}
+				</p>
+				<h1 className="text-display-lg text-ink">{t('admin.category.categories')}</h1>
 			</div>
 
-			<form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border p-4">
+			<form onSubmit={handleSubmit(onSubmit)} className="rounded-[18px] bg-canvas-parchment p-5 md:p-6">
+				<p className="text-body-strong mb-4 text-ink">{t('admin.category.create_category')}</p>
 				<div className="grid gap-3 md:grid-cols-[minmax(180px,1fr)_minmax(240px,2fr)_auto]">
 					<div>
 						<Controller
@@ -242,7 +260,7 @@ const AdminCategoriesPage = () => {
 								<Input {...field} placeholder={t('admin.category.name_placeholder')} aria-invalid={!!errors.name} />
 							)}
 						/>
-						{errors.name && <p className="text-destructive mt-1.5 text-sm">{errors.name.message}</p>}
+						{errors.name && <p className="text-caption mt-1.5 text-destructive">{errors.name.message}</p>}
 					</div>
 					<Controller
 						name="description"

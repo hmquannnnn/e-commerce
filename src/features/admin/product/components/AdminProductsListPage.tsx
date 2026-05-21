@@ -69,19 +69,19 @@ const StockEditor = ({ productId, initialStock, reservedQuantity, availableQuant
 	};
 
 	return (
-		<div className="flex min-w-[190px] flex-col gap-1">
+		<div className="flex min-w-[210px] flex-col gap-1.5">
 			<div className="flex items-center gap-2">
 				<Input
 					type="number"
 					min={0}
 					value={value}
 					onChange={(e) => setValue(e.target.value)}
-					className="h-8 w-24"
+					className="h-9 w-24 px-3 text-[14px]"
 					aria-label={t('admin.product.stock')}
 				/>
 				<Button
 					size="icon-sm"
-					variant="outline"
+					variant="secondary"
 					onClick={handleSave}
 					disabled={updateStock.isPending || value === String(initialStock)}
 					aria-label={t('admin.product.save_stock')}
@@ -89,7 +89,7 @@ const StockEditor = ({ productId, initialStock, reservedQuantity, availableQuant
 					<Save className="h-4 w-4" />
 				</Button>
 			</div>
-			<span className="text-muted-foreground text-xs">
+			<span className="text-fine text-ink-muted-48">
 				{t('admin.product.stock_reserved_available', {
 					reserved: reservedQuantity,
 					available: availableQuantity,
@@ -104,7 +104,8 @@ const StockCell = ({ productId }: StockCellProps) => {
 	const { data, isLoading, isError } = useAdminInventory(productId);
 
 	if (isLoading) return <Skeleton className="h-8 w-32" />;
-	if (isError || !data) return <span className="text-destructive text-xs">{t('admin.product.stock_load_error')}</span>;
+	if (isError || !data)
+		return <span className="text-caption text-destructive">{t('admin.product.stock_load_error')}</span>;
 
 	return (
 		<StockEditor
@@ -139,34 +140,35 @@ const ProductRow = ({ product, categoryName, locale }: ProductRowProps) => {
 	};
 
 	return (
-		<tr className="hover:bg-muted/30 transition-colors">
-			<td className="px-4 py-3">
-				<div className="max-w-[320px]">
-					<p className="font-medium">{product.name}</p>
-					<p className="text-muted-foreground truncate text-xs">#{product.id}</p>
+		<tr className="transition-colors hover:bg-canvas-parchment/40">
+			<td className="px-5 py-4">
+				<div className="max-w-[320px] space-y-0.5">
+					<p className="text-body-strong text-ink">{product.name}</p>
+					<p className="text-fine truncate text-ink-muted-48">#{product.id}</p>
 				</div>
 			</td>
-			<td className="text-muted-foreground px-4 py-3">{categoryName ?? t('admin.product.no_category')}</td>
-			<td className="text-primary px-4 py-3 text-right font-semibold tabular-nums">{formatPrice(product.price)}</td>
-			<td className="px-4 py-3">
+			<td className="text-caption px-5 py-4 text-ink-muted-80">{categoryName ?? t('admin.product.no_category')}</td>
+			<td className="text-body-strong px-5 py-4 text-right text-ink tabular-nums">{formatPrice(product.price)}</td>
+			<td className="px-5 py-4">
 				<StockCell productId={product.id} />
 			</td>
-			<td className="text-muted-foreground px-4 py-3 text-sm">
+			<td className="text-caption px-5 py-4 text-ink-muted-48">
 				{new Date(product.created_at).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US')}
 			</td>
-			<td className="px-4 py-3">
+			<td className="px-5 py-4">
 				<div className="flex justify-end gap-2">
-					<Button size="icon-sm" variant="outline" asChild aria-label={t('admin.product.edit_product')}>
+					<Button size="icon-sm" variant="secondary" asChild aria-label={t('admin.product.edit_product')}>
 						<Link href={`/${locale}${ROUTES.ADMIN.PRODUCTS.EDIT(product.id)}`}>
 							<Pencil className="h-4 w-4" />
 						</Link>
 					</Button>
 					<Button
 						size="icon-sm"
-						variant="destructive"
+						variant="ghost"
 						onClick={handleDelete}
 						disabled={deleteProduct.isPending}
 						aria-label={t('admin.product.delete_product')}
+						className="text-ink-muted-48 hover:text-destructive"
 					>
 						<Trash2 className="h-4 w-4" />
 					</Button>
@@ -211,7 +213,7 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 			return (
 				<div className="space-y-3">
 					{[1, 2, 3, 4].map((i) => (
-						<Skeleton key={i} className="h-16 w-full rounded-xl" />
+						<Skeleton key={i} className="h-16 w-full rounded-[14px]" />
 					))}
 				</div>
 			);
@@ -220,8 +222,8 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 		if (isError || !data) {
 			return (
 				<div className="flex flex-col items-center justify-center gap-4 py-16">
-					<AlertCircle className="text-destructive h-12 w-12" />
-					<p className="text-muted-foreground">{t('admin.product.load_error')}</p>
+					<AlertCircle className="h-12 w-12 text-destructive" />
+					<p className="text-lead text-ink-muted-80">{t('admin.product.load_error')}</p>
 					<Button variant="outline" onClick={() => refetch()} className="gap-2">
 						<RefreshCw className="h-4 w-4" />
 						{t('common.retry')}
@@ -231,24 +233,29 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 		}
 
 		if (data.items.length === 0) {
-			return <p className="text-muted-foreground py-12 text-center">{t('admin.product.empty')}</p>;
+			return (
+				<div className="flex flex-col items-center justify-center gap-3 rounded-[18px] bg-canvas-parchment py-20">
+					<Package className="h-12 w-12 text-ink-muted-48/40" />
+					<p className="text-lead text-ink-muted-80">{t('admin.product.empty')}</p>
+				</div>
+			);
 		}
 
 		return (
 			<>
-				<div className="overflow-x-auto rounded-xl border">
+				<div className="overflow-x-auto rounded-[18px] border border-hairline">
 					<table className="w-full text-sm">
-						<thead className="bg-muted/50 text-muted-foreground">
+						<thead className="text-caption-strong bg-canvas-parchment text-ink-muted-80">
 							<tr>
-								<th className="px-4 py-3 text-left font-medium">{t('admin.product.name')}</th>
-								<th className="px-4 py-3 text-left font-medium">{t('admin.product.category')}</th>
-								<th className="px-4 py-3 text-right font-medium">{t('admin.product.price')}</th>
-								<th className="px-4 py-3 text-left font-medium">{t('admin.product.stock')}</th>
-								<th className="px-4 py-3 text-left font-medium">{t('admin.product.created_at')}</th>
-								<th className="px-4 py-3 text-right font-medium">{t('admin.product.actions')}</th>
+								<th className="px-5 py-3 text-left">{t('admin.product.name')}</th>
+								<th className="px-5 py-3 text-left">{t('admin.product.category')}</th>
+								<th className="px-5 py-3 text-right">{t('admin.product.price')}</th>
+								<th className="px-5 py-3 text-left">{t('admin.product.stock')}</th>
+								<th className="px-5 py-3 text-left">{t('admin.product.created_at')}</th>
+								<th className="px-5 py-3 text-right">{t('admin.product.actions')}</th>
 							</tr>
 						</thead>
-						<tbody className="divide-y">
+						<tbody className="divide-y divide-hairline">
 							{data.items.map((product) => (
 								<ProductRow
 									key={product.id}
@@ -263,19 +270,14 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 
 				{data.total_pages > 1 && (
 					<div className="flex items-center justify-center gap-4 pt-4">
-						<Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+						<Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
 							<ChevronLeft className="h-4 w-4" />
 							{t('order.prev_page')}
 						</Button>
-						<span className="text-muted-foreground text-sm tabular-nums">
+						<span className="text-caption text-ink-muted-48 tabular-nums">
 							{t('order.page_of', { page, total: data.total_pages })}
 						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= data.total_pages}
-							onClick={() => setPage((p) => p + 1)}
-						>
+						<Button variant="ghost" size="sm" disabled={page >= data.total_pages} onClick={() => setPage((p) => p + 1)}>
 							{t('order.next_page')}
 							<ChevronRight className="h-4 w-4" />
 						</Button>
@@ -286,11 +288,11 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 	};
 
 	return (
-		<div className="space-y-6">
-			<div className="flex flex-wrap items-center justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<Package className="h-6 w-6" />
-					<h1 className="text-2xl font-bold">{t('admin.product.products')}</h1>
+		<div className="space-y-8">
+			<div className="flex flex-wrap items-end justify-between gap-4">
+				<div className="space-y-2">
+					<p className="text-tagline text-primary">{t('admin.product.products')}</p>
+					<h1 className="text-display-lg text-ink">{t('admin.product.products')}</h1>
 				</div>
 				<Button asChild className="gap-2">
 					<Link href={`/${locale}${ROUTES.ADMIN.PRODUCTS.NEW}`}>
@@ -300,9 +302,9 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 				</Button>
 			</div>
 
-			<div className="flex flex-col gap-3 md:flex-row">
+			<div className="flex flex-col gap-3 md:flex-row md:items-center">
 				<div className="relative flex-1">
-					<Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+					<Search className="absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2 text-ink-muted-48" />
 					<Input
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
@@ -310,11 +312,11 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 							if (e.key === 'Enter') handleSearch();
 						}}
 						placeholder={t('admin.product.search_placeholder')}
-						className="pl-9"
+						className="pl-12"
 					/>
 				</div>
 				<Select value={categoryId?.toString() ?? ALL_CATEGORIES} onValueChange={handleCategoryChange}>
-					<SelectTrigger className="md:w-[220px]">
+					<SelectTrigger className="h-11 rounded-full border-hairline bg-canvas px-5 md:w-[220px]">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -326,7 +328,7 @@ const AdminProductsListPage = ({ categories }: AdminProductsListPageProps) => {
 						))}
 					</SelectContent>
 				</Select>
-				<Button onClick={handleSearch} variant="outline">
+				<Button onClick={handleSearch} variant="default">
 					{t('common.search')}
 				</Button>
 			</div>

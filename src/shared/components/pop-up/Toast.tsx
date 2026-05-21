@@ -29,7 +29,7 @@ const Toast = ({ variant = EAlertVariant.Info, content, shouldShowAction = true,
 				{shouldShowAction && (
 					<button
 						type="button"
-						className="btn btn-circle btn-ghost btn-xs text-foreground ml-2 text-xs hover:opacity-60"
+						className="btn btn-circle btn-ghost btn-xs ml-2 text-xs text-foreground hover:opacity-60"
 						onClick={() => onDismiss()}
 					>
 						<XIcon />

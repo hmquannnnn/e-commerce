@@ -2,15 +2,25 @@
 	"home": {
 		"easy_returns": "Đổi trả dễ dàng",
 		"easy_returns_desc": "Trong vòng 30 ngày",
-		"featured_products": "Sản phẩm nổi bật",
+		"featured_products": "Drone cho mọi nhiệm vụ",
+		"featured_subtitle": "Khám phá toàn bộ dòng UAV chuyên nghiệp và phổ thông.",
 		"free_shipping": "Miễn phí vận chuyển",
 		"free_shipping_desc": "Đơn hàng từ 299.000đ",
 		"genuine_warranty": "Bảo hành chính hãng",
 		"genuine_warranty_desc": "Cam kết 100% chính hãng",
-		"hero_subtitle": "Khám phá hàng nghìn sản phẩm chất lượng với giá tốt nhất",
-		"hero_title_1": "Mua sắm thông minh,",
-		"hero_title_2": "sống tốt hơn",
+		"hero_cta_primary": "Khám phá drone",
+		"hero_cta_secondary": "Tìm hiểu thêm",
+		"hero_eyebrow": "UAV Store",
+		"hero_subtitle": "Thiết kế để bay xa hơn, ghi hình sắc nét hơn, mở ra góc nhìn mới.",
+		"hero_title_1": "Bay xa hơn.",
+		"hero_title_2": "Nhìn rộng hơn.",
 		"thousands_products": "Hàng nghìn sản phẩm",
-		"thousands_products_desc": "Đa dạng danh mục"
+		"thousands_products_desc": "Đa dạng danh mục",
+		"tile_air_eyebrow": "UAV Air",
+		"tile_air_subtitle": "Gấp gọn hơn cuốn sổ. Vươn tới mây trời.",
+		"tile_air_title": "Khung nhẹ. Sức tải lớn.",
+		"tile_pro_eyebrow": "UAV Pro",
+		"tile_pro_subtitle": "Quay 8K điện ảnh. 60 phút bay liên tục.",
+		"tile_pro_title": "Đẳng cấp Pro. Vươn đến bầu trời."
 	}
 }

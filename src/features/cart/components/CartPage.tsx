@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ShoppingCart, AlertCircle, RefreshCw } from 'lucide-react';
+import { ShoppingBag, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { Button } from '@/src/shared/components/base/ui/button';
@@ -16,22 +16,17 @@ import CartEmpty from './CartEmpty';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
 
-/**
- * Sparse user preferences per cart item. Only tracks explicit changes by the user.
- * Defaults are resolved at render time from cart data via useMemo (no useEffect needed).
- */
 type LinePrefs = { selected?: boolean; orderQty?: number };
-
 type ResolvedLine = { selected: boolean; orderQty: number };
 
 const CartPageSkeleton = () => (
 	<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
 		<div className="space-y-4 lg:col-span-2">
 			{[1, 2, 3].map((i) => (
-				<Skeleton key={i} className="h-28 w-full rounded-xl" />
+				<Skeleton key={i} className="h-32 w-full rounded-[18px]" />
 			))}
 		</div>
-		<Skeleton className="h-64 w-full rounded-xl" />
+		<Skeleton className="h-72 w-full rounded-[18px]" />
 	</div>
 );
 
@@ -42,10 +37,8 @@ const CartPage = () => {
 	const isAuthenticated = useAppSelector((state) => !!state.auth.accessToken);
 	const { data: cart, isLoading, isError, refetch } = useCart();
 
-	// Only stores what the user explicitly changed — no sync with useEffect needed.
 	const [prefs, setPrefs] = useState<Record<string, LinePrefs>>({});
 
-	// Merge cart items with user prefs. New cart items default to selected=true, qty=max.
 	const resolvedLines = useMemo((): Record<string, ResolvedLine> => {
 		if (!cart?.items) return {};
 		const out: Record<string, ResolvedLine> = {};
@@ -119,16 +112,16 @@ const CartPage = () => {
 	if (!isAuthenticated) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-muted-foreground h-14 w-14" />
-				<p className="text-muted-foreground">{t('cart.login_required')}</p>
+				<AlertCircle className="h-14 w-14 text-ink-muted-48" />
+				<p className="text-lead text-ink-muted-80">{t('cart.login_required')}</p>
 			</div>
 		);
 	}
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6">
-				<Skeleton className="h-8 w-40" />
+			<div className="space-y-8">
+				<Skeleton className="h-10 w-48" />
 				<CartPageSkeleton />
 			</div>
 		);
@@ -137,8 +130,8 @@ const CartPage = () => {
 	if (isError) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-destructive h-14 w-14" />
-				<p className="text-muted-foreground">{t('cart.load_error')}</p>
+				<AlertCircle className="h-14 w-14 text-destructive" />
+				<p className="text-lead text-ink-muted-80">{t('cart.load_error')}</p>
 				<Button variant="outline" onClick={() => refetch()} className="gap-2">
 					<RefreshCw className="h-4 w-4" />
 					{t('common.retry')}
@@ -150,14 +143,15 @@ const CartPage = () => {
 	const isEmpty = !cart || cart.items.length === 0;
 
 	return (
-		<div className="space-y-6">
-			<div className="flex flex-wrap items-center gap-3">
-				<ShoppingCart className="h-6 w-6" />
-				<h1 className="text-2xl font-bold">{t('cart.title')}</h1>
+		<div className="space-y-10">
+			<div className="space-y-2">
+				<p className="text-tagline inline-flex items-center gap-2 text-primary">
+					<ShoppingBag className="h-4 w-4" />
+					{t('cart.title')}
+				</p>
+				<h1 className="text-display-lg text-ink">{t('cart.title')}</h1>
 				{!isEmpty && (
-					<span className="text-muted-foreground text-sm">
-						({t('cart.item_count', { count: cart.total_quantity })})
-					</span>
+					<p className="text-lead text-ink-muted-80">{t('cart.item_count', { count: cart.total_quantity })}</p>
 				)}
 			</div>
 
@@ -165,41 +159,45 @@ const CartPage = () => {
 				<CartEmpty />
 			) : (
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-					<div className="space-y-4 lg:col-span-2">
-						<label className="flex cursor-pointer items-center gap-2">
-							<Checkbox
-								checked={selectAllState}
-								onCheckedChange={(checked) => {
-									if (checked === true) selectAll();
-									else deselectAll();
-								}}
-								aria-label={t('cart.select_all_checkbox_aria')}
-							/>
-							<span className="text-sm font-medium">{t('cart.select_all_checkbox_label')}</span>
-						</label>
-						<p className="text-muted-foreground text-sm">{t('cart.select_for_checkout_hint')}</p>
-						{cart.items.map((item) => (
-							<CartItem
-								key={item.product_id}
-								item={item}
-								selection={{
-									selected: resolvedLines[item.product_id]?.selected ?? true,
-									orderQty: resolvedLines[item.product_id]?.orderQty ?? item.quantity,
-									onSelectChange: (selected) =>
-										setPrefs((prev) => ({
-											...prev,
-											[item.product_id]: { ...prev[item.product_id], selected },
-										})),
-									onOrderQtyChange: (raw) => {
-										const orderQty = Math.min(item.quantity, Math.max(1, raw));
-										setPrefs((prev) => ({
-											...prev,
-											[item.product_id]: { ...prev[item.product_id], orderQty },
-										}));
-									},
-								}}
-							/>
-						))}
+					<div className="space-y-5 lg:col-span-2">
+						<div className="flex flex-col gap-1.5 rounded-[14px] bg-canvas-parchment px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+							<label className="press flex cursor-pointer items-center gap-3">
+								<Checkbox
+									checked={selectAllState}
+									onCheckedChange={(checked) => {
+										if (checked === true) selectAll();
+										else deselectAll();
+									}}
+									aria-label={t('cart.select_all_checkbox_aria')}
+								/>
+								<span className="text-caption-strong text-ink">{t('cart.select_all_checkbox_label')}</span>
+							</label>
+							<p className="text-caption text-ink-muted-48">{t('cart.select_for_checkout_hint')}</p>
+						</div>
+						<div className="space-y-4">
+							{cart.items.map((item) => (
+								<CartItem
+									key={item.product_id}
+									item={item}
+									selection={{
+										selected: resolvedLines[item.product_id]?.selected ?? true,
+										orderQty: resolvedLines[item.product_id]?.orderQty ?? item.quantity,
+										onSelectChange: (selected) =>
+											setPrefs((prev) => ({
+												...prev,
+												[item.product_id]: { ...prev[item.product_id], selected },
+											})),
+										onOrderQtyChange: (raw) => {
+											const orderQty = Math.min(item.quantity, Math.max(1, raw));
+											setPrefs((prev) => ({
+												...prev,
+												[item.product_id]: { ...prev[item.product_id], orderQty },
+											}));
+										},
+									}}
+								/>
+							))}
+						</div>
 					</div>
 					<div className="lg:col-span-1">
 						<CartSummary

@@ -27,7 +27,7 @@ export default async function NewProductPage({ params }: { params: Promise<{ loc
 			<div className="flex items-center gap-3">
 				<Link
 					href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`}
-					className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition-colors"
+					className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<ArrowLeft className="h-4 w-4" />
 					{t('admin.product.back_to_products')}
@@ -36,7 +36,7 @@ export default async function NewProductPage({ params }: { params: Promise<{ loc
 
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">{t('admin.product.new_product')}</h1>
-				<p className="text-muted-foreground mt-1 text-sm">{t('admin.product.create_product')}</p>
+				<p className="mt-1 text-sm text-muted-foreground">{t('admin.product.create_product')}</p>
 			</div>
 
 			<CreateProductForm categories={categories} />

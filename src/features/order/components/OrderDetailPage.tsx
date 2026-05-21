@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { AlertCircle, ArrowLeft, CreditCard, Loader2, MapPin, Phone } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
-import { Separator } from '@/src/shared/components/base/ui/separator';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { useAppSelector } from '@/src/core/store/store';
 import { ROUTES } from '@/src/shared/constants/routes';
@@ -75,10 +74,6 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 		});
 	};
 
-	// Re-initiates payment for an already-created PENDING order. Mirrors the
-	// CheckoutPage flow but skips order creation: the order already exists and
-	// inventory is already reserved, so we just create a fresh PaymentIntent
-	// with the provider and redirect to its hosted checkout URL.
 	const handleRetryPayment = () => {
 		if (!order) return;
 		const provider: PaymentProvider = 'payos';
@@ -116,8 +111,8 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 	if (!isAuthenticated) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-muted-foreground h-14 w-14" />
-				<p className="text-muted-foreground">{t('order.detail_login_required')}</p>
+				<AlertCircle className="h-14 w-14 text-ink-muted-48" />
+				<p className="text-lead text-ink-muted-80">{t('order.detail_login_required')}</p>
 				<Button asChild>
 					<Link href={`/${locale}${ROUTES.AUTH.LOGIN}`}>{t('common.login')}</Link>
 				</Button>
@@ -128,9 +123,9 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 	if (isLoading) {
 		return (
 			<div className="space-y-6">
-				<Skeleton className="h-8 w-64" />
-				<Skeleton className="h-32 w-full rounded-xl" />
-				<Skeleton className="h-24 w-full rounded-xl" />
+				<Skeleton className="h-10 w-72" />
+				<Skeleton className="h-44 w-full rounded-[18px]" />
+				<Skeleton className="h-32 w-full rounded-[18px]" />
 			</div>
 		);
 	}
@@ -138,8 +133,8 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 	if (isError || !order) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-destructive h-14 w-14" />
-				<p className="text-muted-foreground">{t('order.detail_not_found')}</p>
+				<AlertCircle className="h-14 w-14 text-destructive" />
+				<p className="text-lead text-ink-muted-80">{t('order.detail_not_found')}</p>
 				<Button variant="outline" asChild>
 					<Link href={`/${locale}${ROUTES.ORDERS.LIST}`}>{t('order.back_to_list')}</Link>
 				</Button>
@@ -148,58 +143,54 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 	}
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-10">
 			<Link
 				href={`/${locale}${ROUTES.ORDERS.LIST}`}
-				className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
+				className="text-caption press inline-flex items-center gap-1.5 text-ink-muted-48 hover:text-ink"
 			>
-				<ArrowLeft className="h-4 w-4" />
+				<ArrowLeft className="h-3.5 w-3.5" />
 				{t('order.back_to_list')}
 			</Link>
 
-			<div className="bg-card rounded-xl border p-6">
-				<div className="flex flex-wrap items-start justify-between gap-4">
-					<div>
-						<h1 className="text-xl font-bold">{t('order.detail_title')}</h1>
-						<p className="text-muted-foreground mt-1 font-mono text-sm">{order.id}</p>
-						<p className="text-muted-foreground mt-2 text-sm">
+			<div className="rounded-[18px] bg-canvas-parchment p-7 md:p-10">
+				<div className="flex flex-wrap items-start justify-between gap-6">
+					<div className="space-y-2">
+						<p className="text-tagline text-primary">{t('order.detail_title')}</p>
+						<h1 className="text-display-md font-mono text-ink">#{order.id.slice(0, 12)}</h1>
+						<p className="text-caption text-ink-muted-48">
 							{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
 						</p>
 					</div>
-					<div className="flex flex-col items-end gap-2">
+					<div className="flex flex-col items-end gap-3">
 						<Badge variant={statusVariant(order.status)}>{t(`order.status_${order.status}`)}</Badge>
-						<p className="text-sm">
+						<p className="text-caption text-ink-muted-48">
 							{t('order.payment_method')}:{' '}
-							<span className="font-medium">{t(paymentMethodLabelKey(order.payment_method))}</span>
+							<span className="text-caption-strong text-ink">{t(paymentMethodLabelKey(order.payment_method))}</span>
 						</p>
-						<p className="text-primary text-lg font-bold">{formatPrice(order.total_price)}</p>
+						<p className="text-display-md text-ink tabular-nums">{formatPrice(order.total_price)}</p>
 					</div>
 				</div>
 
-				<Separator className="my-6" />
-
-				<div className="grid gap-3 text-sm sm:grid-cols-2">
-					<div className="bg-muted/30 flex items-center gap-2 rounded-lg p-3">
-						<Phone className="text-muted-foreground h-4 w-4" />
+				<div className="mt-8 grid gap-3 border-t border-hairline pt-6 text-sm sm:grid-cols-2">
+					<div className="flex items-center gap-3 rounded-[14px] border border-hairline bg-canvas p-4">
+						<Phone className="h-4 w-4 text-ink-muted-48" />
 						<div>
-							<p className="text-muted-foreground text-xs">{t('order.shipping_phone')}</p>
-							<p className="font-medium">{order.shipping_phone}</p>
+							<p className="text-caption text-ink-muted-48">{t('order.shipping_phone')}</p>
+							<p className="text-body-strong text-ink">{order.shipping_phone}</p>
 						</div>
 					</div>
-					<div className="bg-muted/30 flex items-start gap-2 rounded-lg p-3">
-						<MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
+					<div className="flex items-start gap-3 rounded-[14px] border border-hairline bg-canvas p-4">
+						<MapPin className="mt-0.5 h-4 w-4 text-ink-muted-48" />
 						<div>
-							<p className="text-muted-foreground text-xs">{t('order.shipping_address')}</p>
-							<p className="font-medium">{order.shipping_address}</p>
+							<p className="text-caption text-ink-muted-48">{t('order.shipping_address')}</p>
+							<p className="text-body-strong text-ink">{order.shipping_address}</p>
 						</div>
 					</div>
 				</div>
-
-				{(canRetryPayment || canCancel) && <Separator className="my-6" />}
 
 				{canRetryPayment && (
-					<div className="bg-warning/10 mb-4 flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-						<p className="text-muted-foreground text-sm">{t('order.pay_now_hint')}</p>
+					<div className="mt-6 flex flex-col gap-3 rounded-[14px] border border-hairline bg-canvas p-5 sm:flex-row sm:items-center sm:justify-between">
+						<p className="text-caption text-ink-muted-80">{t('order.pay_now_hint')}</p>
 						<Button onClick={handleRetryPayment} disabled={isRedirecting} className="gap-2">
 							{isRedirecting ? (
 								<>
@@ -217,22 +208,24 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 				)}
 
 				{canCancel && (
-					<Button variant="destructive" onClick={handleCancel} disabled={cancelOrder.isPending}>
-						{cancelOrder.isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								{t('order.cancelling')}
-							</>
-						) : (
-							t('order.cancel_order')
-						)}
-					</Button>
+					<div className="mt-6 flex justify-end">
+						<Button variant="destructive" onClick={handleCancel} disabled={cancelOrder.isPending} className="gap-2">
+							{cancelOrder.isPending ? (
+								<>
+									<Loader2 className="h-4 w-4 animate-spin" />
+									{t('order.cancelling')}
+								</>
+							) : (
+								t('order.cancel_order')
+							)}
+						</Button>
+					</div>
 				)}
 			</div>
 
 			<div>
-				<h2 className="mb-4 text-lg font-semibold">{t('order.items')}</h2>
-				<div className="space-y-3">
+				<h2 className="text-tagline mb-5 text-ink">{t('order.items')}</h2>
+				<div className="space-y-4">
 					{order.items.map((item) => (
 						<OrderLineItemRow key={`${item.product_id}-${item.product_name}`} item={item} />
 					))}

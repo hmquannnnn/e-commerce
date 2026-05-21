@@ -2,15 +2,25 @@
 	"home": {
 		"easy_returns": "Easy Returns",
 		"easy_returns_desc": "Within 30 days",
-		"featured_products": "Featured Products",
+		"featured_products": "Drones for every mission",
+		"featured_subtitle": "Browse our full lineup of professional and prosumer UAVs.",
 		"free_shipping": "Free Shipping",
 		"free_shipping_desc": "Orders from 299,000 VND",
 		"genuine_warranty": "Genuine Warranty",
 		"genuine_warranty_desc": "100% authentic guaranteed",
-		"hero_subtitle": "Discover thousands of quality products at the best prices",
-		"hero_title_1": "Shop smart,",
-		"hero_title_2": "live better",
+		"hero_cta_primary": "Shop drones",
+		"hero_cta_secondary": "Learn more",
+		"hero_eyebrow": "UAV Store",
+		"hero_subtitle": "Engineered to fly farther, capture sharper, and unlock new perspectives.",
+		"hero_title_1": "Fly forward.",
+		"hero_title_2": "See further.",
 		"thousands_products": "Thousands of Products",
-		"thousands_products_desc": "Diverse categories"
+		"thousands_products_desc": "Diverse categories",
+		"tile_air_eyebrow": "UAV Air",
+		"tile_air_subtitle": "Folds smaller than a notebook. Climbs above the clouds.",
+		"tile_air_title": "Light frame. Heavy lift.",
+		"tile_pro_eyebrow": "UAV Pro",
+		"tile_pro_subtitle": "8K cinema-class capture meets 60-minute flight time.",
+		"tile_pro_title": "Pro-grade. Sky-bound."
 	}
 }
