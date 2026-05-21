@@ -21,10 +21,13 @@ import { useProduct, useCategories } from '../api';
 import { ROUTES } from '@/src/shared/constants/routes';
 import { useAddCartItem } from '@/src/features/cart/api';
 import type { IProductImage } from '../interfaces';
+import { getLegacySpecEntries, getProductSpecDisplayGroups, type ProductSpecDisplayGroup } from '../specs/templates';
 
 interface ProductDetailProps {
 	id: string;
 }
+
+type TranslationFn = ReturnType<typeof useTranslations>;
 
 const ProductDetailSkeleton = () => (
 	<div className="grid grid-cols-1 gap-12 md:grid-cols-2">
@@ -140,6 +143,59 @@ const ProductImageGallery = ({ images, productName }: { images: IProductImage[];
 	);
 };
 
+const ProductSpecsSection = ({
+	groups,
+	legacySpecs,
+	t,
+}: {
+	groups: ProductSpecDisplayGroup[];
+	legacySpecs: { key: string; value: string }[];
+	t: TranslationFn;
+}) => {
+	if (groups.length > 0) {
+		return (
+			<div className="space-y-3">
+				<h2 className="text-tagline text-ink">{t('product.detail.specifications')}</h2>
+				<div className="space-y-4">
+					{groups.map((group) => (
+						<div key={group.key} className="overflow-hidden rounded-[18px] border border-hairline">
+							<div className="text-caption-strong border-b border-hairline bg-canvas-parchment px-5 py-3 text-ink">
+								{t(group.labelKey)}
+							</div>
+							<dl className="divide-y divide-hairline">
+								{group.fields.map((field) => (
+									<div key={field.key} className="grid grid-cols-[2fr_3fr] gap-4 px-5 py-3">
+										<dt className="text-caption text-ink-muted-48">{t(field.labelKey)}</dt>
+										<dd className="text-caption-strong text-ink">{field.value}</dd>
+									</div>
+								))}
+							</dl>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	if (legacySpecs.length > 0) {
+		return (
+			<div className="space-y-3">
+				<h2 className="text-tagline text-ink">{t('product.detail.specifications')}</h2>
+				<dl className="divide-y divide-hairline rounded-[18px] border border-hairline">
+					{legacySpecs.map((spec) => (
+						<div key={spec.key} className="grid grid-cols-[2fr_3fr] gap-4 px-5 py-3">
+							<dt className="text-caption text-ink-muted-48 capitalize">{spec.key}</dt>
+							<dd className="text-caption-strong text-ink">{spec.value}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		);
+	}
+
+	return null;
+};
+
 const ProductDetail = ({ id }: ProductDetailProps) => {
 	const t = useTranslations();
 	const locale = useLocale();
@@ -187,7 +243,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 			);
 		}
 
-		const specs = product.specs && typeof product.specs === 'object' ? Object.entries(product.specs) : [];
+		const specGroups = getProductSpecDisplayGroups(product.specs, product.category_id);
+		const legacySpecs = specGroups.length > 0 ? [] : getLegacySpecEntries(product.specs);
 
 		return (
 			<div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:items-start">
@@ -205,19 +262,7 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 						<p className="text-display-md text-ink tabular-nums">{formatPrice(product.price)}</p>
 					</div>
 
-					{specs.length > 0 && (
-						<div className="space-y-3">
-							<h2 className="text-tagline text-ink">{t('product.detail.specifications')}</h2>
-							<dl className="divide-y divide-hairline rounded-[18px] border border-hairline">
-								{specs.map(([key, value]) => (
-									<div key={key} className="grid grid-cols-[2fr_3fr] gap-4 px-5 py-3">
-										<dt className="text-caption text-ink-muted-48 capitalize">{key}</dt>
-										<dd className="text-caption-strong text-ink">{String(value)}</dd>
-									</div>
-								))}
-							</dl>
-						</div>
-					)}
+					<ProductSpecsSection groups={specGroups} legacySpecs={legacySpecs} t={t} />
 
 					<div className="flex flex-col gap-3 sm:flex-row">
 						<Button size="lg" className="flex-1 gap-2" onClick={handleAddToCart} disabled={addCartItem.isPending}>

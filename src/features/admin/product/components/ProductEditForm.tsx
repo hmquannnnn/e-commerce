@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/component
 import { Input } from '@/src/shared/components/base/ui/input';
 import { Textarea } from '@/src/shared/components/base/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
-import { cn } from '@/src/shared/lib/utils';
 import { ICategory } from '@/src/features/product/interfaces';
 import useAppRouter from '@/src/shared/hooks/useAppRouter';
 import { ROUTES } from '@/src/shared/constants/routes';
@@ -21,16 +20,18 @@ import { createProductSchema, CreateProductFormValues } from '../schema';
 import { useUpdateProduct } from '../api';
 import { ADMIN_PRODUCT_QUERY_KEYS } from '../api/query-keys';
 import { IAdminProductDetail } from '../interfaces';
+import ProductSpecsField from './ProductSpecsField';
+import {
+	buildProductSpecsPayload,
+	createEmptySpecsForTemplate,
+	getSpecTemplateByCategoryId,
+	specsPayloadToFormValues,
+} from '@/src/features/product/specs/templates';
 
 interface ProductEditFormProps {
 	product: IAdminProductDetail;
 	categories: ICategory[];
 }
-
-const stringifySpecs = (specs?: Record<string, unknown>) => {
-	if (!specs || Object.keys(specs).length === 0) return '';
-	return JSON.stringify(specs, null, 2);
-};
 
 const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 	const t = useTranslations();
@@ -42,6 +43,8 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 	const {
 		control,
 		handleSubmit,
+		setValue,
+		clearErrors,
 		formState: { errors },
 	} = useForm<CreateProductFormValues>({
 		resolver: zodResolver(schema),
@@ -50,20 +53,13 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 			description: product.description ?? '',
 			price: String(product.price),
 			category_id: product.category_id?.toString() ?? '',
-			specs: stringifySpecs(product.specs),
+			specs: specsPayloadToFormValues(product.specs, product.category_id),
 		},
 	});
 
 	const onSubmit = (formData: CreateProductFormValues) => {
-		let specs: Record<string, string> | undefined;
-		if (formData.specs && formData.specs.trim()) {
-			try {
-				specs = JSON.parse(formData.specs);
-			} catch {
-				toast.error(t('admin.product.specs_invalid_json'));
-				return;
-			}
-		}
+		const categoryId = Number(formData.category_id);
+		const specs = buildProductSpecsPayload(categoryId, formData.specs);
 
 		updateProduct.mutate(
 			{
@@ -72,7 +68,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 					name: formData.name,
 					description: formData.description || undefined,
 					price: Number(formData.price),
-					category_id: formData.category_id ? Number(formData.category_id) : undefined,
+					category_id: categoryId,
 					specs,
 				},
 			},
@@ -120,25 +116,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 							/>
 						</div>
 
-						<div>
-							<label className="mb-1.5 block text-sm font-medium">
-								{t('admin.product.specs')}
-								<span className="ml-1 text-xs text-muted-foreground">(JSON)</span>
-							</label>
-							<Controller
-								name="specs"
-								control={control}
-								render={({ field }) => (
-									<Textarea
-										{...field}
-										rows={7}
-										placeholder='{"weight": "1.2kg", "battery": "5000mAh"}'
-										className={cn('min-h-[160px] font-mono text-[14px]', errors.specs && 'border-destructive')}
-									/>
-								)}
-							/>
-							{errors.specs && <p className="mt-1.5 text-sm text-destructive">{errors.specs.message}</p>}
-						</div>
+						<ProductSpecsField control={control} errors={errors} />
 					</CardContent>
 				</Card>
 			</div>
@@ -175,13 +153,26 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 						</div>
 
 						<div>
-							<label className="mb-1.5 block text-sm font-medium">{t('admin.product.category')}</label>
+							<label className="mb-1.5 block text-sm font-medium">
+								{t('admin.product.category')} <span className="text-destructive">*</span>
+							</label>
 							<Controller
 								name="category_id"
 								control={control}
 								render={({ field }) => (
-									<Select value={field.value?.toString() ?? ''} onValueChange={field.onChange}>
-										<SelectTrigger>
+									<Select
+										value={field.value?.toString() ?? ''}
+										onValueChange={(value) => {
+											field.onChange(value);
+											const template = getSpecTemplateByCategoryId(value);
+											setValue('specs', template ? createEmptySpecsForTemplate(template) : {}, {
+												shouldDirty: true,
+												shouldValidate: true,
+											});
+											clearErrors('specs');
+										}}
+									>
+										<SelectTrigger aria-invalid={!!errors.category_id}>
 											<SelectValue placeholder={t('admin.product.select_category')} />
 										</SelectTrigger>
 										<SelectContent>
@@ -194,6 +185,7 @@ const ProductEditForm = ({ product, categories }: ProductEditFormProps) => {
 									</Select>
 								)}
 							/>
+							{errors.category_id && <p className="mt-1.5 text-sm text-destructive">{errors.category_id.message}</p>}
 						</div>
 					</CardContent>
 				</Card>

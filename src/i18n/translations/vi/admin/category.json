@@ -8,6 +8,7 @@
 		"delete": "Xóa danh mục",
 		"delete_confirm": "Xóa danh mục này?",
 		"delete_error": "Không thể xóa danh mục",
+		"delete_has_products": "Không thể xóa: danh mục này vẫn còn sản phẩm. Hãy chuyển hoặc xóa sản phẩm trước.",
 		"delete_success": "Đã xóa danh mục",
 		"description": "Mô tả",
 		"description_placeholder": "Mô tả",

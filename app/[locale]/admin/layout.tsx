@@ -70,24 +70,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
 	return (
 		<div className="flex min-h-screen flex-col bg-canvas">
-			{/* ── Tier 1: global-nav ──────────────────────────────────────────── */}
-			<nav className="sticky top-0 z-50 w-full bg-surface-black">
-				<div className="mx-auto flex h-11 max-w-[1280px] items-center justify-between px-5">
-					{/* Brand — links to admin products list (stays within admin) */}
+			{/* ── Single header ───────────────────────────────────────────────── */}
+			<nav className="frost sticky top-0 z-50 w-full border-b border-hairline/60">
+				<div className="mx-auto flex h-[52px] max-w-[1280px] items-center justify-between px-5">
+					{/* Brand */}
 					<Link
 						href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`}
-						className="inline-flex items-center gap-1.5 text-[14px] font-medium tracking-tight text-body-on-dark"
+						className="text-tagline press inline-flex items-center gap-1.5 text-ink"
 					>
 						<ShoppingBag className="h-4 w-4" />
 						UAV Store · {t('common.admin')}
 					</Link>
 
-					{/* User dropdown with logout */}
+					{/* Admin nav links */}
+					<div className="flex items-center gap-1">
+						{adminLinks.map((link) => (
+							<Link
+								key={link.href}
+								href={`/${locale}${link.href}`}
+								className={cn(
+									'press inline-flex h-9 items-center rounded-full px-3.5 text-[14px] tracking-[-0.014em]',
+									isActive(link.href) ? 'bg-ink text-white' : 'text-ink-muted-80 hover:text-ink'
+								)}
+							>
+								{link.label}
+							</Link>
+						))}
+					</div>
+
+					{/* User dropdown */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<button className="text-nav-link press inline-flex items-center gap-1.5 text-body-muted-on-dark outline-none hover:text-white">
+							<button
+								className={cn(
+									'press text-caption inline-flex h-8 items-center gap-1.5 rounded-full',
+									'border border-hairline bg-canvas px-3 text-ink outline-none hover:bg-canvas-parchment'
+								)}
+							>
 								<User className="h-3.5 w-3.5" />
-								<span>{user.name ?? user.email}</span>
+								<span className="hidden max-w-[120px] truncate sm:inline">{user.name ?? user.email}</span>
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="min-w-[180px]">
@@ -104,27 +125,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					</DropdownMenu>
 				</div>
 			</nav>
-
-			{/* ── Tier 2: sub-nav-frosted ─────────────────────────────────────── */}
-			<div className="frost sticky top-11 z-40 w-full border-b border-hairline/60">
-				<div className="mx-auto flex h-[52px] max-w-[1280px] items-center justify-between px-5">
-					<p className="text-tagline text-ink">{t('common.admin')}</p>
-					<div className="flex items-center gap-1">
-						{adminLinks.map((link) => (
-							<Link
-								key={link.href}
-								href={`/${locale}${link.href}`}
-								className={cn(
-									'press inline-flex h-9 items-center rounded-full px-3.5 text-[14px] tracking-[-0.014em]',
-									isActive(link.href) ? 'bg-ink text-white' : 'text-ink-muted-80 hover:text-ink'
-								)}
-							>
-								{link.label}
-							</Link>
-						))}
-					</div>
-				</div>
-			</div>
 
 			<main className="mx-auto w-full max-w-[1280px] flex-1 px-5 py-12">{children}</main>
 
