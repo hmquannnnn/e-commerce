@@ -1,9 +1,11 @@
 {
 	"detail": {
 		"back_to_products": "Quay lại danh sách",
-		"description": "Mô tả sản phẩm",
+		"continue_browsing": "Tiếp tục khám phá",
+		"description": "Thiết kế để bay cùng bạn, ở mọi nơi.",
 		"load_error": "Không thể tải thông tin sản phẩm",
 		"not_found": "Không tìm thấy sản phẩm",
+		"price_label": "Từ",
 		"specifications": "Thông số kỹ thuật"
 	}
 }

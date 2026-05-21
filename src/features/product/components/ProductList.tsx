@@ -14,10 +14,10 @@ import {
 } from '@/src/shared/components/base/ui/pagination';
 import { Input } from '@/src/shared/components/base/ui/input';
 import { Button } from '@/src/shared/components/base/ui/button';
-import { Badge } from '@/src/shared/components/base/ui/badge';
 import { useProducts, useCategories } from '../api';
 import ProductCard from './ProductCard';
-import { Search, AlertCircle, RefreshCw, SlidersHorizontal, X } from 'lucide-react';
+import { Search, AlertCircle, RefreshCw, X } from 'lucide-react';
+import { cn } from '@/src/shared/lib/utils';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -41,16 +41,14 @@ const parseOptionalPrice = (value: string): number | null | undefined => {
 };
 
 const ProductCardSkeleton = () => (
-	<div className="flex flex-col overflow-hidden rounded-xl border">
-		<Skeleton className="aspect-square w-full" />
-		<div className="flex flex-col gap-2 p-4">
+	<div className="flex flex-col overflow-hidden rounded-[18px] border border-hairline bg-canvas">
+		<Skeleton className="aspect-square w-full rounded-none" />
+		<div className="flex flex-col gap-2 p-5">
 			<Skeleton className="h-4 w-3/4" />
 			<Skeleton className="h-3 w-full" />
 			<Skeleton className="h-3 w-2/3" />
 			<Skeleton className="mt-2 h-5 w-1/2" />
-		</div>
-		<div className="p-4 pt-0">
-			<Skeleton className="h-8 w-full" />
+			<Skeleton className="mt-2 h-9 w-full rounded-full" />
 		</div>
 	</div>
 );
@@ -61,6 +59,28 @@ const getPaginationRange = (currentPage: number, totalPages: number): (number | 
 	if (currentPage >= totalPages - 3) return [1, 'ellipsis', ...Array.from({ length: 5 }, (_, i) => totalPages - 4 + i)];
 	return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages];
 };
+
+interface CategoryChipProps {
+	active: boolean;
+	onClick: () => void;
+	children: React.ReactNode;
+}
+
+/** Pill-shaped category chip per `configurator-option-chip` in DESIGN.md. */
+const CategoryChip = ({ active, onClick, children }: CategoryChipProps) => (
+	<button
+		type="button"
+		onClick={onClick}
+		className={cn(
+			'press inline-flex h-9 items-center rounded-full px-4 text-[14px] tracking-[-0.014em] transition-colors',
+			active
+				? 'bg-ink text-white'
+				: 'border border-hairline bg-canvas text-ink-muted-80 hover:border-ink hover:text-ink'
+		)}
+	>
+		{children}
+	</button>
+);
 
 const ProductList = () => {
 	const t = useTranslations();
@@ -159,8 +179,8 @@ const ProductList = () => {
 		if (isError) {
 			return (
 				<div className="flex flex-col items-center justify-center gap-4 py-20">
-					<AlertCircle className="text-destructive h-12 w-12" />
-					<p className="text-muted-foreground">{t('product.list.load_error')}</p>
+					<AlertCircle className="h-12 w-12 text-destructive" />
+					<p className="text-ink-muted-48">{t('product.list.load_error')}</p>
 					<Button variant="outline" onClick={() => refetch()} className="gap-2">
 						<RefreshCw className="h-4 w-4" />
 						{t('common.retry')}
@@ -171,7 +191,7 @@ const ProductList = () => {
 
 		if (isLoading) {
 			return (
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+				<div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
 					{Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
 						<ProductCardSkeleton key={i} />
 					))}
@@ -182,8 +202,8 @@ const ProductList = () => {
 		if (!data?.items?.length) {
 			return (
 				<div className="flex flex-col items-center justify-center gap-3 py-20">
-					<Search className="text-muted-foreground/40 h-16 w-16" />
-					<p className="text-muted-foreground font-medium">{t('product.list.no_products')}</p>
+					<Search className="h-16 w-16 text-ink-muted-48/40" />
+					<p className="font-medium text-ink-muted-48">{t('product.list.no_products')}</p>
 					{hasActiveFilters && (
 						<Button variant="ghost" onClick={handleClearFilters}>
 							{t('product.list.clear_filters')}
@@ -195,10 +215,10 @@ const ProductList = () => {
 
 		return (
 			<>
-				<div className="text-muted-foreground text-sm">
+				<div className="text-caption text-ink-muted-48">
 					{t('product.list.showing_count', { count: data.items.length, total: data.total })}
 				</div>
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+				<div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
 					{data.items.map((product) => (
 						<ProductCard
 							key={product.id}
@@ -212,105 +232,85 @@ const ProductList = () => {
 	};
 
 	return (
-		<section className="space-y-6">
-			{/* Search bar */}
-			<div className="flex gap-2">
+		<section className="space-y-8">
+			{/* ── Search row ────────────────────────────────────────────────── */}
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 				<div className="relative flex-1">
-					<Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+					<Search className="absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2 text-ink-muted-48" />
 					<Input
 						placeholder={t('product.list.search_placeholder')}
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
 						onKeyDown={handleKeyDown}
-						className="pl-9"
+						className="pl-12"
 					/>
 				</div>
-				<Button onClick={handleSearch} variant="default">
+				<Button onClick={handleSearch} variant="default" size="default" className="sm:w-auto">
 					{t('common.search')}
 				</Button>
 			</div>
 
-			{/* Price filter */}
-			<div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-				<div className="text-muted-foreground flex h-9 items-center gap-2 text-sm font-medium">
-					<SlidersHorizontal className="h-4 w-4" />
-					{t('product.list.price_filter')}
+			{/* ── Price filter row ──────────────────────────────────────────── */}
+			<div className="flex flex-col gap-3">
+				<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+					<span className="text-caption-strong text-ink">{t('product.list.price_filter')}</span>
+					<Input
+						type="text"
+						inputMode="numeric"
+						placeholder={t('product.list.min_price_placeholder')}
+						value={minPriceInput}
+						onChange={(e) => handleMinPriceChange(e.target.value)}
+						onKeyDown={handlePriceKeyDown}
+						aria-invalid={!!priceError}
+						className="sm:w-44"
+					/>
+					<Input
+						type="text"
+						inputMode="numeric"
+						placeholder={t('product.list.max_price_placeholder')}
+						value={maxPriceInput}
+						onChange={(e) => handleMaxPriceChange(e.target.value)}
+						onKeyDown={handlePriceKeyDown}
+						aria-invalid={!!priceError}
+						className="sm:w-44"
+					/>
+					<Button onClick={handlePriceApply} variant="secondary" size="sm">
+						{t('product.list.apply_filters')}
+					</Button>
+					{hasActiveFilters && (
+						<Button
+							onClick={handleClearFilters}
+							variant="ghost"
+							size="icon-sm"
+							aria-label={t('product.list.clear_filters')}
+						>
+							<X className="h-4 w-4" />
+						</Button>
+					)}
 				</div>
-				<div className="flex flex-1 flex-col gap-2 md:max-w-2xl">
-					<div className="flex flex-col gap-2 sm:flex-row">
-						<Input
-							type="text"
-							inputMode="numeric"
-							placeholder={t('product.list.min_price_placeholder')}
-							value={minPriceInput}
-							onChange={(e) => handleMinPriceChange(e.target.value)}
-							onKeyDown={handlePriceKeyDown}
-							aria-invalid={!!priceError}
-							className="h-9 sm:w-40"
-						/>
-						<Input
-							type="text"
-							inputMode="numeric"
-							placeholder={t('product.list.max_price_placeholder')}
-							value={maxPriceInput}
-							onChange={(e) => handleMaxPriceChange(e.target.value)}
-							onKeyDown={handlePriceKeyDown}
-							aria-invalid={!!priceError}
-							className="h-9 sm:w-40"
-						/>
-						<div className="flex gap-2">
-							<Button onClick={handlePriceApply} variant="outline" className="h-9 flex-1 gap-2 sm:flex-none">
-								<SlidersHorizontal className="h-4 w-4" />
-								{t('product.list.apply_filters')}
-							</Button>
-							{hasActiveFilters && (
-								<Button
-									onClick={handleClearFilters}
-									variant="ghost"
-									size="icon"
-									className="h-9 w-9 shrink-0"
-									aria-label={t('product.list.clear_filters')}
-								>
-									<X className="h-4 w-4" />
-								</Button>
-							)}
-						</div>
-					</div>
-					{priceError && <p className="text-destructive text-sm">{priceError}</p>}
-				</div>
+				{priceError && <p className="text-caption text-destructive">{priceError}</p>}
 			</div>
 
-			{/* Category filter */}
+			{/* ── Category chips ────────────────────────────────────────────── */}
 			<div className="flex flex-wrap gap-2">
 				{categoriesLoading ? (
-					Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-7 w-20 rounded-full" />)
+					Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-9 w-24 rounded-full" />)
 				) : (
 					<>
-						<Badge
-							variant={categoryId === undefined ? 'default' : 'outline'}
-							className="cursor-pointer px-4 py-1.5 text-sm"
-							onClick={() => handleCategoryChange(undefined)}
-						>
+						<CategoryChip active={categoryId === undefined} onClick={() => handleCategoryChange(undefined)}>
 							{t('product.list.all_categories')}
-						</Badge>
+						</CategoryChip>
 						{categoriesData?.map((cat) => (
-							<Badge
-								key={cat.id}
-								variant={categoryId === cat.id ? 'default' : 'outline'}
-								className="cursor-pointer px-4 py-1.5 text-sm"
-								onClick={() => handleCategoryChange(cat.id)}
-							>
+							<CategoryChip key={cat.id} active={categoryId === cat.id} onClick={() => handleCategoryChange(cat.id)}>
 								{cat.name}
-							</Badge>
+							</CategoryChip>
 						))}
 					</>
 				)}
 			</div>
 
-			{/* Product grid */}
 			{renderProductGrid()}
 
-			{/* Pagination */}
 			{!isLoading && !isError && totalPages > 1 && (
 				<Pagination>
 					<PaginationContent>

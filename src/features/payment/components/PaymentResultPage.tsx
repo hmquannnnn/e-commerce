@@ -76,7 +76,7 @@ const PaymentResultPage = () => {
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<AlertCircle className="text-destructive h-5 w-5" />
+							<AlertCircle className="h-5 w-5 text-destructive" />
 							{t('order.payment_result_failed')}
 						</CardTitle>
 					</CardHeader>

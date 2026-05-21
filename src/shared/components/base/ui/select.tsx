@@ -29,14 +29,24 @@ function SelectTrigger({
 			data-slot="select-trigger"
 			data-size={size}
 			className={cn(
-				"border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 shadow-xs flex w-fit items-center justify-between gap-2 whitespace-nowrap rounded-md border bg-transparent px-3 py-2 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				'press flex items-center justify-between gap-2 border-hairline bg-canvas whitespace-nowrap text-ink',
+				'rounded-full border px-5 transition-[color,border-color,box-shadow] outline-none',
+				'data-[placeholder]:text-ink-muted-48',
+				"[&_svg:not([class*='text-'])]:text-ink-muted-48",
+				'focus-visible:border-primary-focus focus-visible:ring-[3px] focus-visible:ring-primary-focus/30',
+				'aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/25',
+				'disabled:cursor-not-allowed disabled:opacity-50',
+				'data-[size=default]:h-11 data-[size=default]:text-[15px]',
+				'data-[size=sm]:h-9 data-[size=sm]:px-4 data-[size=sm]:text-[13px]',
+				'*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
+				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				className
 			)}
 			{...props}
 		>
 			{children}
 			<SelectPrimitive.Icon asChild>
-				<ChevronDownIcon className="size-4 opacity-50" />
+				<ChevronDownIcon className="size-4 opacity-60" />
 			</SelectPrimitive.Icon>
 		</SelectPrimitive.Trigger>
 	);
@@ -54,7 +64,7 @@ function SelectContent({
 			<SelectPrimitive.Content
 				data-slot="select-content"
 				className={cn(
-					'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 max-h-(--radix-select-content-available-height) origin-(--radix-select-content-transform-origin) relative z-50 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border shadow-md',
+					'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[10rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-[14px] border border-hairline bg-canvas text-ink',
 					position === 'popper' &&
 						'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
 					className
@@ -83,7 +93,7 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
 	return (
 		<SelectPrimitive.Label
 			data-slot="select-label"
-			className={cn('text-muted-foreground px-2 py-1.5 text-xs', className)}
+			className={cn('px-2 py-1.5 text-xs text-muted-foreground', className)}
 			{...props}
 		/>
 	);
@@ -94,7 +104,12 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
 		<SelectPrimitive.Item
 			data-slot="select-item"
 			className={cn(
-				"focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground outline-hidden *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				'focus:bg-canvas-parchment focus:text-ink',
+				"[&_svg:not([class*='text-'])]:text-ink-muted-48",
+				'relative flex w-full cursor-default items-center gap-2 rounded-[10px] py-2 pr-9 pl-3 text-[14px] select-none',
+				'outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+				'*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2',
+				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				className
 			)}
 			{...props}
@@ -113,7 +128,7 @@ function SelectSeparator({ className, ...props }: React.ComponentProps<typeof Se
 	return (
 		<SelectPrimitive.Separator
 			data-slot="select-separator"
-			className={cn('bg-border pointer-events-none -mx-1 my-1 h-px', className)}
+			className={cn('pointer-events-none -mx-1 my-1 h-px bg-border', className)}
 			{...props}
 		/>
 	);

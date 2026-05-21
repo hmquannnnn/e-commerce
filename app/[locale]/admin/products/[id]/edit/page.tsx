@@ -36,7 +36,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ lo
 			<div className="flex items-center gap-3">
 				<Link
 					href={`/${locale}${ROUTES.ADMIN.PRODUCTS.LIST}`}
-					className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition-colors"
+					className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<ArrowLeft className="h-4 w-4" />
 					{t('admin.product.back_to_products')}
@@ -45,14 +45,14 @@ export default async function EditProductPage({ params }: { params: Promise<{ lo
 
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">{t('admin.product.edit_product')}</h1>
-				<p className="text-muted-foreground mt-1 text-sm">{product?.name ?? id}</p>
+				<p className="mt-1 text-sm text-muted-foreground">{product?.name ?? id}</p>
 			</div>
 
 			{product ? (
 				<ProductEditForm product={product} categories={categories} />
 			) : (
 				<div className="flex flex-col items-center justify-center gap-3 rounded-xl border py-16">
-					<AlertCircle className="text-destructive h-12 w-12" />
+					<AlertCircle className="h-12 w-12 text-destructive" />
 					<p className="text-muted-foreground">{t('admin.product.product_not_found')}</p>
 				</div>
 			)}

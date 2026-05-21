@@ -1,9 +1,11 @@
 {
 	"detail": {
-		"back_to_products": "Back to products",
-		"description": "Product Description",
+		"back_to_products": "Back to drones",
+		"continue_browsing": "Continue browsing",
+		"description": "Engineered to fly with you, anywhere.",
 		"load_error": "Failed to load product details",
 		"not_found": "Product not found",
+		"price_label": "From",
 		"specifications": "Specifications"
 	}
 }

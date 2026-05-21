@@ -95,6 +95,9 @@ export const SearchableCombobox = ({
 		setQuery('');
 	};
 
+	// Aligned with `Input` and `SelectTrigger`: pill-shaped (rounded-full),
+	// 44px tall, hairline border, 17px text, Action-Blue focus ring.
+	// The popover panel mirrors `SelectContent` (rounded-[14px]).
 	return (
 		<div ref={wrapperRef} className={cn('relative w-full', className)}>
 			<button
@@ -102,29 +105,33 @@ export const SearchableCombobox = ({
 				disabled={disabled}
 				onClick={() => setIsOpen((prev) => !prev)}
 				className={cn(
-					'border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+					'press flex h-11 w-full items-center justify-between gap-2 rounded-full border border-hairline bg-canvas px-5 text-[15px] text-ink transition-[color,border-color,box-shadow] outline-none',
+					'focus-visible:border-primary-focus focus-visible:ring-[3px] focus-visible:ring-primary-focus/30',
 					'disabled:cursor-not-allowed disabled:opacity-50',
-					!selected && 'text-muted-foreground'
+					!selected && 'text-ink-muted-48'
 				)}
 			>
 				<span className="line-clamp-1 text-left">{triggerLabel}</span>
 				<ChevronDown
-					className={cn('h-4 w-4 shrink-0 opacity-50 transition-transform', isOpen && 'rotate-180')}
+					className={cn('h-4 w-4 shrink-0 text-ink-muted-48 opacity-80 transition-transform', isOpen && 'rotate-180')}
 				/>
 			</button>
 
 			{isOpen && (
-				<div className="bg-popover text-popover-foreground absolute left-0 right-0 top-full z-50 mt-1 flex max-h-72 flex-col overflow-hidden rounded-md border shadow-md">
-					<div className="border-b p-2">
+				<div className="absolute top-full right-0 left-0 z-50 mt-2 flex max-h-72 flex-col overflow-hidden rounded-[14px] border border-hairline bg-canvas text-ink">
+					<div className="border-b border-hairline p-2">
 						<div className="relative">
-							<Search className="text-muted-foreground absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2" />
+							<Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-ink-muted-48" />
 							<input
 								ref={inputRef}
 								type="text"
 								value={query}
 								onChange={(e) => setQuery(e.target.value)}
 								placeholder={searchPlaceholder}
-								className="border-input bg-background ring-offset-background focus-visible:ring-ring h-8 w-full rounded-md border pl-8 pr-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+								className={cn(
+									'h-9 w-full rounded-full border border-hairline bg-canvas pr-3 pl-10 text-[14px] text-ink transition-[color,border-color,box-shadow] outline-none placeholder:text-ink-muted-48',
+									'focus-visible:border-primary-focus focus-visible:ring-[3px] focus-visible:ring-primary-focus/30'
+								)}
 							/>
 						</div>
 					</div>
@@ -132,14 +139,14 @@ export const SearchableCombobox = ({
 						{(() => {
 							if (isLoading) {
 								return (
-									<div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
+									<div className="flex items-center justify-center gap-2 py-6 text-[14px] text-ink-muted-48">
 										<Loader2 className="h-4 w-4 animate-spin" />
 										<span>{loadingText ?? '...'}</span>
 									</div>
 								);
 							}
 							if (filtered.length === 0) {
-								return <div className="text-muted-foreground py-6 text-center text-sm">{emptyText}</div>;
+								return <div className="py-6 text-center text-[14px] text-ink-muted-48">{emptyText}</div>;
 							}
 							return filtered.map((item) => {
 								const isSelected = item.value === value;
@@ -149,12 +156,12 @@ export const SearchableCombobox = ({
 										type="button"
 										onClick={() => handleSelect(item.value)}
 										className={cn(
-											'hover:bg-accent hover:text-accent-foreground relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-sm',
-											isSelected && 'bg-accent text-accent-foreground'
+											'relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-[14px] text-ink hover:bg-canvas-parchment',
+											isSelected && 'bg-canvas-parchment'
 										)}
 									>
 										<span className="line-clamp-1 text-left">{item.label}</span>
-										{isSelected && <Check className="h-4 w-4 shrink-0" />}
+										{isSelected && <Check className="h-4 w-4 shrink-0 text-primary" />}
 									</button>
 								);
 							});

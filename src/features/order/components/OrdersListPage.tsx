@@ -39,8 +39,8 @@ const OrdersListPage = () => {
 	if (!isAuthenticated) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-muted-foreground h-14 w-14" />
-				<p className="text-muted-foreground">{t('order.list_login_required')}</p>
+				<AlertCircle className="h-14 w-14 text-ink-muted-48" />
+				<p className="text-lead text-ink-muted-80">{t('order.list_login_required')}</p>
 				<Button asChild>
 					<Link href={`/${locale}${ROUTES.AUTH.LOGIN}`}>{t('common.login')}</Link>
 				</Button>
@@ -50,10 +50,10 @@ const OrdersListPage = () => {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-4">
-				<Skeleton className="h-8 w-40" />
+			<div className="space-y-5">
+				<Skeleton className="h-10 w-48" />
 				{[1, 2, 3, 4].map((i) => (
-					<Skeleton key={i} className="h-20 w-full rounded-xl" />
+					<Skeleton key={i} className="h-28 w-full rounded-[18px]" />
 				))}
 			</div>
 		);
@@ -62,8 +62,8 @@ const OrdersListPage = () => {
 	if (isError || !data) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-4 py-24">
-				<AlertCircle className="text-destructive h-14 w-14" />
-				<p className="text-muted-foreground">{t('order.load_error')}</p>
+				<AlertCircle className="h-14 w-14 text-destructive" />
+				<p className="text-lead text-ink-muted-80">{t('order.load_error')}</p>
 				<Button variant="outline" onClick={() => refetch()} className="gap-2">
 					<RefreshCw className="h-4 w-4" />
 					{t('common.retry')}
@@ -75,42 +75,50 @@ const OrdersListPage = () => {
 	const shortId = (id: string) => id.slice(0, 8);
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center gap-3">
-				<Package className="h-6 w-6" />
-				<h1 className="text-2xl font-bold">{t('order.list_title')}</h1>
+		<div className="space-y-10">
+			<div className="space-y-2">
+				<p className="text-tagline inline-flex items-center gap-2 text-primary">
+					<Package className="h-4 w-4" />
+					{t('order.list_title')}
+				</p>
+				<h1 className="text-display-lg text-ink">{t('order.list_title')}</h1>
 			</div>
 
 			{data.items.length === 0 ? (
-				<p className="text-muted-foreground py-12 text-center">{t('order.list_empty')}</p>
+				<div className="flex flex-col items-center justify-center gap-3 rounded-[18px] bg-canvas-parchment py-24">
+					<Package className="h-12 w-12 text-ink-muted-48/40" />
+					<p className="text-lead text-ink-muted-80">{t('order.list_empty')}</p>
+				</div>
 			) : (
 				<>
-					<ul className="space-y-3">
+					<ul className="space-y-4">
 						{data.items.map((order) => (
 							<li key={order.id}>
 								<Link
 									href={`/${locale}${ROUTES.ORDERS.DETAIL(order.id)}`}
-									className="bg-card hover:bg-muted/50 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 transition-colors"
+									className="press flex flex-wrap items-start justify-between gap-5 rounded-[18px] border border-hairline bg-canvas p-5 transition-colors hover:border-ink-muted-48/40"
 								>
-									<div>
-										<p className="font-mono text-sm font-medium">#{shortId(order.id)}</p>
-										<p className="text-muted-foreground text-xs">
-											{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
-										</p>
-										<div className="text-muted-foreground mt-2 space-y-1 text-xs">
+									<div className="space-y-3">
+										<div className="space-y-1">
+											<p className="text-body-strong font-mono text-ink">#{shortId(order.id)}</p>
+											<p className="text-caption text-ink-muted-48">
+												{new Date(order.created_at).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}
+											</p>
+										</div>
+										<div className="text-caption space-y-1 text-ink-muted-48">
 											<p className="flex items-center gap-1.5">
 												<Phone className="h-3.5 w-3.5" />
 												<span>{order.shipping_phone}</span>
 											</p>
 											<p className="flex items-start gap-1.5">
-												<MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+												<MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
 												<span className="line-clamp-2">{order.shipping_address}</span>
 											</p>
 										</div>
 									</div>
-									<div className="flex flex-wrap items-center gap-3">
+									<div className="flex flex-col items-end gap-2">
 										<Badge variant={statusVariant(order.status)}>{t(`order.status_${order.status}`)}</Badge>
-										<span className="text-primary font-semibold">{formatPrice(order.total_price)}</span>
+										<span className="text-body-strong text-ink tabular-nums">{formatPrice(order.total_price)}</span>
 									</div>
 								</Link>
 							</li>
@@ -120,7 +128,7 @@ const OrdersListPage = () => {
 					{data.total_pages > 1 && (
 						<div className="flex items-center justify-center gap-4 pt-4">
 							<Button
-								variant="outline"
+								variant="ghost"
 								size="sm"
 								disabled={page <= 1}
 								onClick={() => setPage((p) => p - 1)}
@@ -129,11 +137,11 @@ const OrdersListPage = () => {
 								<ChevronLeft className="h-4 w-4" />
 								{t('order.prev_page')}
 							</Button>
-							<span className="text-muted-foreground text-sm tabular-nums">
+							<span className="text-caption text-ink-muted-48 tabular-nums">
 								{t('order.page_of', { page, total: data.total_pages })}
 							</span>
 							<Button
-								variant="outline"
+								variant="ghost"
 								size="sm"
 								disabled={page >= data.total_pages}
 								onClick={() => setPage((p) => p + 1)}
