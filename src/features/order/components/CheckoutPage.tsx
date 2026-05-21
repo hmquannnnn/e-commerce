@@ -7,14 +7,20 @@ import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { AlertCircle, ArrowLeft, CreditCard, RefreshCw, Loader2, Package } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
+import { Input } from '@/src/shared/components/base/ui/input';
 import { Separator } from '@/src/shared/components/base/ui/separator';
 import { Skeleton } from '@/src/shared/components/base/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/components/base/ui/select';
+import {
+	SearchableCombobox,
+	type ISearchableComboboxItem,
+} from '@/src/shared/components/base/ui/searchable-combobox';
 import { useAppDispatch, useAppSelector } from '@/src/core/store/store';
 import { clearCheckoutDraft } from '@/src/core/store/checkout-draft.slice';
 import { ROUTES } from '@/src/shared/constants/routes';
 import { formatPrice } from '@/src/shared/lib/utils';
 import { useCart } from '@/src/features/cart/api';
+import { useDistricts, useProvinces, useWards } from '@/src/features/location/api';
 import { useCreateOrder, getOrderErrorCode } from '../api';
 import { useCreatePayment } from '@/src/features/payment/api';
 import type { ICartItem } from '@/src/features/cart/interfaces';
@@ -73,6 +79,64 @@ const CheckoutPage = () => {
 	const createOrder = useCreateOrder();
 	const createPayment = useCreatePayment();
 	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
+	const [shippingPhone, setShippingPhone] = useState('');
+	const [provinceCode, setProvinceCode] = useState('');
+	const [districtCode, setDistrictCode] = useState('');
+	const [wardCode, setWardCode] = useState('');
+	const [addressDetail, setAddressDetail] = useState('');
+
+	const { data: provinces, isLoading: isLoadingProvinces } = useProvinces();
+	const { data: districts, isLoading: isLoadingDistricts } = useDistricts(provinceCode);
+	const { data: wards, isLoading: isLoadingWards } = useWards(districtCode);
+
+	const provinceItems = useMemo<ISearchableComboboxItem[]>(
+		() =>
+			(provinces ?? []).map((p) => ({
+				value: p.code,
+				label: p.name,
+				searchText: `${p.name} ${p.code_name}`,
+			})),
+		[provinces]
+	);
+	const districtItems = useMemo<ISearchableComboboxItem[]>(
+		() =>
+			(districts ?? []).map((d) => ({
+				value: d.code,
+				label: d.name,
+				searchText: `${d.name} ${d.code_name}`,
+			})),
+		[districts]
+	);
+	const wardItems = useMemo<ISearchableComboboxItem[]>(
+		() =>
+			(wards ?? []).map((w) => ({
+				value: w.code,
+				label: w.name,
+				searchText: `${w.name} ${w.code_name}`,
+			})),
+		[wards]
+	);
+
+	const selectedProvince = useMemo(
+		() => provinces?.find((p) => p.code === provinceCode),
+		[provinces, provinceCode]
+	);
+	const selectedDistrict = useMemo(
+		() => districts?.find((d) => d.code === districtCode),
+		[districts, districtCode]
+	);
+	const selectedWard = useMemo(() => wards?.find((w) => w.code === wardCode), [wards, wardCode]);
+
+	const handleProvinceChange = (next: string) => {
+		setProvinceCode(next);
+		setDistrictCode('');
+		setWardCode('');
+	};
+
+	const handleDistrictChange = (next: string) => {
+		setDistrictCode(next);
+		setWardCode('');
+	};
 	// Controls the entire submit → order → payment → redirect lifecycle.
 	// While true the component renders a processing state, preventing any
 	// flash to empty-cart or skeleton caused by the cart being invalidated
@@ -155,6 +219,27 @@ const CheckoutPage = () => {
 		if (submitLockedRef.current) return;
 		if (!draftLines?.length || !resolvedLines?.length) return;
 
+		const shippingPhoneValue = shippingPhone.trim();
+		const addressDetailValue = addressDetail.trim();
+		if (!shippingPhoneValue || !selectedProvince || !selectedDistrict || !selectedWard || !addressDetailValue) {
+			toast.error(t('order.shipping_required'));
+			return;
+		}
+
+		// Compose backend-friendly single-line address (short names per UX choice):
+		// "<street>, <ward>, <district>, <province>"
+		const shippingAddressValue = [
+			addressDetailValue,
+			selectedWard.name,
+			selectedDistrict.name,
+			selectedProvince.name,
+		].join(', ');
+
+		if (shippingPhoneValue.length > 20 || shippingAddressValue.length > 500) {
+			toast.error(t('order.shipping_invalid'));
+			return;
+		}
+
 		submitLockedRef.current = true;
 		setIsSubmitting(true);
 
@@ -166,7 +251,12 @@ const CheckoutPage = () => {
 		// Order-service persists the chosen method as-is (CASH | QR_CODE).
 		// Provider routing happens only when we actually create a payment intent.
 		createOrder.mutate(
-			{ payment_method: paymentMethod, items },
+			{
+				payment_method: paymentMethod,
+				shipping_phone: shippingPhoneValue,
+				shipping_address: shippingAddressValue,
+				items,
+			},
 			{
 				onSuccess: (order) => {
 					toast.success(t('order.place_order_success'));
@@ -188,6 +278,7 @@ const CheckoutPage = () => {
 					else if (code === 'CART_CHANGED') toast.error(t('order.error_cart_changed'));
 					else if (code === 'INSUFFICIENT_STOCK') toast.error(t('order.error_stock'));
 					else if (code === 'PRODUCT_NOT_FOUND') toast.error(t('order.error_product'));
+					else if (code === 'INVALID_SHIPPING_INFO') toast.error(t('order.shipping_invalid'));
 					else toast.error(t('order.place_order_error'));
 				},
 			}
@@ -271,6 +362,83 @@ const CheckoutPage = () => {
 				</div>
 
 				<div className="bg-card h-fit space-y-6 rounded-xl border p-6 lg:col-span-1">
+					<div className="space-y-4">
+						<p className="text-sm font-medium">{t('order.shipping_info')}</p>
+						<div className="space-y-2">
+							<label className="text-sm font-medium" htmlFor="shipping-phone">
+								{t('order.shipping_phone')}
+							</label>
+							<Input
+								id="shipping-phone"
+								value={shippingPhone}
+								onChange={(event) => setShippingPhone(event.target.value)}
+								placeholder={t('order.shipping_phone_placeholder')}
+								maxLength={20}
+								autoComplete="tel"
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<label className="text-sm font-medium">{t('order.shipping_province')}</label>
+							<SearchableCombobox
+								items={provinceItems}
+								value={provinceCode}
+								onChange={handleProvinceChange}
+								isLoading={isLoadingProvinces}
+								placeholder={t('order.shipping_province_placeholder')}
+								searchPlaceholder={t('order.shipping_search_placeholder')}
+								emptyText={t('order.shipping_empty_results')}
+								loadingText={t('common.loading')}
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<label className="text-sm font-medium">{t('order.shipping_district')}</label>
+							<SearchableCombobox
+								items={districtItems}
+								value={districtCode}
+								onChange={handleDistrictChange}
+								disabled={!provinceCode}
+								isLoading={isLoadingDistricts}
+								placeholder={t('order.shipping_district_placeholder')}
+								disabledHint={t('order.shipping_district_disabled')}
+								searchPlaceholder={t('order.shipping_search_placeholder')}
+								emptyText={t('order.shipping_empty_results')}
+								loadingText={t('common.loading')}
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<label className="text-sm font-medium">{t('order.shipping_ward')}</label>
+							<SearchableCombobox
+								items={wardItems}
+								value={wardCode}
+								onChange={setWardCode}
+								disabled={!districtCode}
+								isLoading={isLoadingWards}
+								placeholder={t('order.shipping_ward_placeholder')}
+								disabledHint={t('order.shipping_ward_disabled')}
+								searchPlaceholder={t('order.shipping_search_placeholder')}
+								emptyText={t('order.shipping_empty_results')}
+								loadingText={t('common.loading')}
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<label className="text-sm font-medium" htmlFor="shipping-detail">
+								{t('order.shipping_address_detail')}
+							</label>
+							<Input
+								id="shipping-detail"
+								value={addressDetail}
+								onChange={(event) => setAddressDetail(event.target.value)}
+								placeholder={t('order.shipping_address_detail_placeholder')}
+								maxLength={200}
+								autoComplete="street-address"
+							/>
+						</div>
+					</div>
+
 					<div className="space-y-2 text-sm">
 						<div className="flex justify-between">
 							<span className="text-muted-foreground">{t('order.checkout_selected_total')}</span>

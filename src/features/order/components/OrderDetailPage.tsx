@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
-import { AlertCircle, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CreditCard, Loader2, MapPin, Phone } from 'lucide-react';
 import { Button } from '@/src/shared/components/base/ui/button';
 import { Badge } from '@/src/shared/components/base/ui/badge';
 import { Separator } from '@/src/shared/components/base/ui/separator';
@@ -173,6 +173,25 @@ const OrderDetailPage = ({ orderId }: OrderDetailPageProps) => {
 							<span className="font-medium">{t(paymentMethodLabelKey(order.payment_method))}</span>
 						</p>
 						<p className="text-primary text-lg font-bold">{formatPrice(order.total_price)}</p>
+					</div>
+				</div>
+
+				<Separator className="my-6" />
+
+				<div className="grid gap-3 text-sm sm:grid-cols-2">
+					<div className="bg-muted/30 flex items-center gap-2 rounded-lg p-3">
+						<Phone className="text-muted-foreground h-4 w-4" />
+						<div>
+							<p className="text-muted-foreground text-xs">{t('order.shipping_phone')}</p>
+							<p className="font-medium">{order.shipping_phone}</p>
+						</div>
+					</div>
+					<div className="bg-muted/30 flex items-start gap-2 rounded-lg p-3">
+						<MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
+						<div>
+							<p className="text-muted-foreground text-xs">{t('order.shipping_address')}</p>
+							<p className="font-medium">{order.shipping_address}</p>
+						</div>
 					</div>
 				</div>
 
