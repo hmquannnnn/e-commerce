@@ -14,13 +14,7 @@ export default defineConfig([
 	...next,
 	{
 		files: ['**/*.{js,jsx,ts,tsx}'],
-		ignores: [
-			'node_modules/**/*',
-			'dist/**/*',
-			'build/**/*',
-			'.react-router/**/*',
-			'coverage/**/*',
-		],
+		ignores: ['node_modules/**/*', 'dist/**/*', 'build/**/*', '.react-router/**/*', 'coverage/**/*', 'gitops-repo/**'],
 		settings: {
 			react: {
 				version: 'detect',
