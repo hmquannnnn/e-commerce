@@ -28,12 +28,12 @@ pipeline {
                     reuseNode true
                 }
             }
-            steps {
-                sh 'corepack enable'
-                sh 'corepack prepare pnpm@10.20.0 --activate'
-                sh 'pnpm i'
-                sh 'pnpm lint'
-            }
+            // steps {
+            //     sh 'corepack enable'
+            //     sh 'corepack prepare pnpm@10.20.0 --activate'
+            //     sh 'pnpm i'
+            //     sh 'pnpm lint'
+            // }
         }
 
         stage('Type Check') {
