@@ -39,7 +39,7 @@
 		"payment_error_generic": "Could not initiate payment. Please try again.",
 		"payment_error_order_not_payable": "This order is not available for payment.",
 		"payment_method": "Payment method",
-		"payment_qr_code": "QR Code (PayOS)",
+		"payment_qr_code": "QR Code",
 		"payment_redirect": "Redirecting to payment gateway...",
 		"payment_result_cancel": "Payment cancelled",
 		"payment_result_cancel_desc": "You cancelled the payment. Your order is still saved.",

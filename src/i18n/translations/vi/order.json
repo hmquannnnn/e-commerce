@@ -39,7 +39,7 @@
 		"payment_error_generic": "Không thể khởi tạo thanh toán. Vui lòng thử lại.",
 		"payment_error_order_not_payable": "Đơn hàng này không thể thanh toán.",
 		"payment_method": "Phương thức thanh toán",
-		"payment_qr_code": "Mã QR (PayOS)",
+		"payment_qr_code": "Mã QR",
 		"payment_redirect": "Đang chuyển tới cổng thanh toán...",
 		"payment_result_cancel": "Đã huỷ thanh toán",
 		"payment_result_cancel_desc": "Bạn đã huỷ thanh toán. Đơn hàng vẫn được lưu lại.",
