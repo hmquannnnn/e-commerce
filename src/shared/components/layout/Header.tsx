@@ -89,7 +89,7 @@ const Header = () => {
 					className="text-tagline press inline-flex items-center gap-1.5 text-ink"
 				>
 					<ShoppingBag className="h-4 w-4" />
-					UAV Store
+					UAV Store 123
 				</Link>
 
 				{/* Centre nav — hidden on mobile */}
