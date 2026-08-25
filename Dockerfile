@@ -22,9 +22,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_API_ENDPOINT=http://api.uav-store.io.vn/api
-ARG NEXT_PUBLIC_MINIO_PUBLIC_URL=http://storage.uav-store.io.vn
-ARG NEXT_PUBLIC_STORAGE_BASE_URL=http://storage.uav-store.io.vn
+ARG NEXT_PUBLIC_API_ENDPOINT=https://api.uav-store.io.vn/api
+ARG NEXT_PUBLIC_MINIO_PUBLIC_URL=https://s3.ap-southeast-1.amazonaws.com
+ARG NEXT_PUBLIC_STORAGE_BASE_URL=https://s3.ap-southeast-1.amazonaws.com
 
 ENV NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT
 ENV NEXT_PUBLIC_MINIO_PUBLIC_URL=$NEXT_PUBLIC_MINIO_PUBLIC_URL
@@ -46,9 +46,9 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_API_ENDPOINT=http://api.uav-store.io.vn/api
-ARG NEXT_PUBLIC_MINIO_PUBLIC_URL=http://storage.uav-store.io.vn
-ARG NEXT_PUBLIC_STORAGE_BASE_URL=http://storage.uav-store.io.vn
+ARG NEXT_PUBLIC_API_ENDPOINT=https://api.uav-store.io.vn/api
+ARG NEXT_PUBLIC_MINIO_PUBLIC_URL=https://s3.ap-southeast-1.amazonaws.com
+ARG NEXT_PUBLIC_STORAGE_BASE_URL=https://s3.ap-southeast-1.amazonaws.com
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
