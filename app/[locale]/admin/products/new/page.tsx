@@ -7,6 +7,10 @@ import { ICategory } from '@/src/features/product/interfaces';
 import CreateProductForm from '@/src/features/admin/product/components/CreateProductForm';
 import { ROUTES } from '@/src/shared/constants/routes';
 
+// Admin pages are auth-gated and data-driven — never prerender at build time
+// (the API is unreachable during `next build`, which hangs the export).
+export const dynamic = 'force-dynamic';
+
 async function getCategories(): Promise<ICategory[]> {
 	try {
 		const apiClient = initializeApiClientInstance({ includeAuthHeader: false });

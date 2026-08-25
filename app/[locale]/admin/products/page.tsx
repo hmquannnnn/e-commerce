@@ -3,6 +3,10 @@ import { IApiResponse } from '@/src/core/api/interface';
 import AdminProductsListPage from '@/src/features/admin/product/components/AdminProductsListPage';
 import { ICategory } from '@/src/features/product/interfaces';
 
+// Admin pages are auth-gated and data-driven — never prerender at build time
+// (the API is unreachable during `next build`, which hangs the export).
+export const dynamic = 'force-dynamic';
+
 async function getCategories(): Promise<ICategory[]> {
 	try {
 		const apiClient = initializeApiClientInstance({ includeAuthHeader: false });

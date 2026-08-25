@@ -8,6 +8,10 @@ import { IAdminProductDetail } from '@/src/features/admin/product/interfaces';
 import { ICategory } from '@/src/features/product/interfaces';
 import { ROUTES } from '@/src/shared/constants/routes';
 
+// Admin pages are auth-gated and data-driven — never prerender at build time
+// (the API is unreachable during `next build`, which hangs the export).
+export const dynamic = 'force-dynamic';
+
 async function getProduct(id: string): Promise<IAdminProductDetail | null> {
 	try {
 		const apiClient = initializeApiClientInstance({ includeAuthHeader: false });
